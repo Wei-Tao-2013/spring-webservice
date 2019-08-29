@@ -1,0 +1,10 @@
+.classpath
+.project
+.settings/
+.vscode/
+SAPJConnector/target/
+BOBService/target/
+BOBService/src/main/resources/*.json
+
+
+
