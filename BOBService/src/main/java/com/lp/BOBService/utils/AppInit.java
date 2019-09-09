@@ -1,17 +1,13 @@
 package com.lp.BOBService.utils;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sap.tc.logging.Category;
 import com.sap.tc.logging.Location;
-import com.sap.tc.logging.Severity;
-import com.sap.tc.logging.SimpleLogger;
 
 /**
  * Servlet implementation class AppInit

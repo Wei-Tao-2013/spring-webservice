@@ -25,8 +25,9 @@ import com.google.maps.GeocodingApi;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.GeocodingResult;
 import com.lp.connector.exception.ConnectorException;
-import com.lp.BOBService.model.RegistrationRequest;
-import com.lp.BOBService.model.RegistrationResponse;
+import com.lp.BOBService.model.AuthUser;
+import com.lp.BOBService.model.Request;
+import com.lp.BOBService.model.Response;
 import com.lp.BOBService.selfRegistration.PortalJCO;
 import com.lp.BOBService.selfRegistration.PortalUME;
 import com.lp.BOBService.service.PortalDetailsResponse;
@@ -78,28 +79,28 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * (non-Javadoc)
 	 * 
 	 * @see com.lp.BOBService.service.PortalDetailsResponse#checkEmail(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse checkEmail(final RegistrationRequest registrationRequest) {
+	public Response checkEmail(final Request Request) {
 
 		// secure registerCustomer service on portal
-		RegistrationResponse RegResponseSecure = checkEncryptSession(registrationRequest);
+		Response RegResponseSecure = checkEncryptSession(Request);
 		if (AppConstants.RETURN_UME_FALSE.equals(RegResponseSecure.getReturnUME())) {
 			RegResponseSecure.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
 			return RegResponseSecure;
 		}
 		// secure end this solution would be changed accordingly if web service moves
 		// out from portal
-		RegistrationResponse RegResponse;
+		Response RegResponse;
 		try {
-			RegResponse = portalJCOImpl.callCustomerValidation(registrationRequest);
+			RegResponse = portalJCOImpl.callCustomerValidation(Request);
 			RegResponse.setGoogleAPI(AppData.googleAPI);
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.checkEmail",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -111,11 +112,11 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see com.lp.BOBService.service.PortalDetailsResponse#validateRecaptcha()
 	 */
-	public RegistrationResponse validateRecaptcha(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse = new RegistrationResponse();
+	public Response validateRecaptcha(final Request Request) {
+		Response RegResponse = new Response();
 		JSONObject jsonObject;
 		try {
-			jsonObject = PortalServiceUtils.performRecaptchaSiteVerify(registrationRequest.getGoogleRecaptchaToken());
+			jsonObject = PortalServiceUtils.performRecaptchaSiteVerify(Request.getGoogleRecaptchaToken());
 
 			SimpleLogger.log(Severity.INFO, Category.SYS_LOGGING, loc, "validateRecaptcha.validateRecaptcha",
 					"your remote addr IP is " + httpRequest.getRemoteAddr());
@@ -145,18 +146,18 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see com.lp.BOBService.service.PortalDetailsResponse#sendVerifyEmail()
 	 */
-	public RegistrationResponse sendVerifyEmail() {
+	public Response sendVerifyEmail() {
 		/*
-		 * if (!PortalServiceUtils.checkIpBlock(httpRequest.getRemoteAddr())){
-		 * RegistrationResponse RegResponseBlock = new RegistrationResponse();
+		 * if (!PortalServiceUtils.checkIpBlock(httpRequest.getRemoteAddr())){ Response
+		 * RegResponseBlock = new Response();
 		 * RegResponseBlock.setReturnUME(AppConstants.RETURN_UME_FALSE);
 		 * RegResponseBlock.
 		 * setErrReason("This Ip is blocked for a while ,please try again, IP is  " +
 		 * httpRequest.getRemoteAddr()); return RegResponseBlock; };
 		 */
 
-		RegistrationResponse RegResponse = new RegistrationResponse();
-		RegistrationRequest registrationReq = new RegistrationRequest();
+		Response RegResponse = new Response();
+		Request registrationReq = new Request();
 
 		String emailAddress = null;
 		IUserMaint userMaint = null;
@@ -173,7 +174,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			}
 			if (emailAddress != null) {
 				registrationReq.setEmailAddress(emailAddress);
-				RegistrationResponse RegResponseEncrypt = portalUMEImpl.getEncryptPwd(emailAddress);
+				Response RegResponseEncrypt = portalUMEImpl.getEncryptPwd(emailAddress);
 				String initialSession = (httpSession.getAttribute("encryptSessionInitial") != null)
 						? httpSession.getAttribute("encryptSessionInitial").toString()
 						: "";
@@ -264,7 +265,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.sendVerifyEmail",
 					"With request of logon id " + emailAddress);
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			// RegResponse = new RegistrationResponse();
+			// RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
@@ -277,12 +278,12 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see
 	 * com.lp.BOBService.service.PortalDetailsResponse#checkCustomerNumber(com.lp
-	 * .BOBService.model.RegistrationRequest)
+	 * .BOBService.model.Request)
 	 */
-	public RegistrationResponse checkCustomerNumber(final RegistrationRequest registrationRequest) {
+	public Response checkCustomerNumber(final Request Request) {
 
 		// Secure registerCustomer service on portal
-		RegistrationResponse RegResponseSecure = checkEncryptSession(registrationRequest);
+		Response RegResponseSecure = checkEncryptSession(Request);
 		if (AppConstants.RETURN_UME_FALSE.equals(RegResponseSecure.getReturnUME())) {
 			RegResponseSecure.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
 			return RegResponseSecure;
@@ -290,11 +291,11 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		// Secure end this solution would be changed accordingly if web service moves
 		// out from portal
 
-		RegistrationResponse RegResponse;
-		RegistrationResponse RegResponseMandatory;
+		Response RegResponse;
+		Response RegResponseMandatory;
 		try {
-			RegResponse = portalJCOImpl.callCustomerValidation(registrationRequest);
-			RegResponseMandatory = portalJCOImpl.callMandatoryIndicator(registrationRequest);
+			RegResponse = portalJCOImpl.callCustomerValidation(Request);
+			RegResponseMandatory = portalJCOImpl.callMandatoryIndicator(Request);
 			RegResponse.setMandatory(RegResponseMandatory.getMandatory());
 			// RegResponse.setMandatory("true");
 			RegResponse.setGoogleAPI(AppData.googleAPI);
@@ -304,9 +305,9 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.checkCustomerNumber",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -318,23 +319,23 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see
 	 * com.lp.BOBService.service.PortalDetailsResponse#validateWorkEmail(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse validateWorkEmail(final RegistrationRequest registrationRequest) {
+	public Response validateWorkEmail(final Request Request) {
 
 		// secure registerCustomer service on portal
-		RegistrationResponse RegResponseSecure = checkEncryptSession(registrationRequest);
+		Response RegResponseSecure = checkEncryptSession(Request);
 		if (AppConstants.RETURN_UME_FALSE.equals(RegResponseSecure.getReturnUME())) {
 			RegResponseSecure.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
 			return RegResponseSecure;
 		}
 		// secure end this solution would be changed accordingly if web service moves
 		// out from portal
-		RegistrationResponse RegResponse;
-		RegistrationResponse RegResponseMandatory;
+		Response RegResponse;
+		Response RegResponseMandatory;
 		try {
-			RegResponse = portalJCOImpl.callWorkEamilValiation(registrationRequest);
-			RegResponseMandatory = portalJCOImpl.callMandatoryIndicator(registrationRequest);
+			RegResponse = portalJCOImpl.callWorkEamilValiation(Request);
+			RegResponseMandatory = portalJCOImpl.callMandatoryIndicator(Request);
 			RegResponse.setMandatory(RegResponseMandatory.getMandatory());
 			// RegResponse.setMandatory("true");
 			RegResponse.setGoogleAPI(AppData.googleAPI);
@@ -345,9 +346,9 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.validateWorkEmail",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -357,26 +358,24 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.service.PortalDetailsResponse#registerCustomer(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * @see com.lp.BOBService.service.PortalDetailsResponse#registerCustomer(com.lp.
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse registerCustomer(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse, RegResponseSecure;
+	public Response registerCustomer(final Request Request) {
+		Response RegResponse, RegResponseSecure;
 		try {
 			// secure registerCustomer service on portal
-			RegResponseSecure = checkEncryptSession(registrationRequest);
+			RegResponseSecure = checkEncryptSession(Request);
 			if (AppConstants.RETURN_UME_FALSE.equals(RegResponseSecure.getReturnUME())) {
 				RegResponseSecure.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
 				return RegResponseSecure;
 			}
 			// secure end this solution would be changed accordingly if web service moves
 			// out from portal
-			RegResponse = portalJCOImpl.callCustomerRegistration(registrationRequest);
+			RegResponse = portalJCOImpl.callCustomerRegistration(Request);
 			// call UME to assign pending role for this user
 			if (AppConstants.CRM_STATUS_PENDING.equalsIgnoreCase(RegResponse.getAppStatus())) {
-				RegistrationResponse RegResponseUME = portalUMEImpl
-						.assignPendingGroup(registrationRequest.getEmailAddress());
+				Response RegResponseUME = portalUMEImpl.assignPendingGroup(Request.getEmailAddress());
 				if (AppConstants.RETURN_UME_TRUE.equalsIgnoreCase(RegResponseUME.getReturnUME())) {
 					RegResponse.setReturnUME(AppConstants.RETURN_UME_TRUE);
 				} else {
@@ -384,8 +383,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				}
 			} else if (AppConstants.CRM_STATUS_APPROVAL.equalsIgnoreCase(RegResponse.getAppStatus())) { // //call UME to
 																										// for this user
-				RegistrationResponse RegResponseUME = portalUMEImpl
-						.assignApprovalGroup(registrationRequest.getEmailAddress());
+				Response RegResponseUME = portalUMEImpl.assignApprovalGroup(Request.getEmailAddress());
 				if (AppConstants.RETURN_UME_TRUE.equalsIgnoreCase(RegResponseUME.getReturnUME())) {
 					RegResponse.setReturnUME(AppConstants.RETURN_UME_TRUE);
 				} else {
@@ -398,9 +396,9 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.registerCustomer",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -410,44 +408,43 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.service.PortalDetailsResponse#registerCustomer(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * @see com.lp.BOBService.service.PortalDetailsResponse#registerCustomer(com.lp.
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse verifyToken(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse;
+	public Response verifyToken(final Request Request) {
+		Response RegResponse;
 		try {
-			RegResponse = portalJCOImpl.callVerifyToken(registrationRequest);
+			RegResponse = portalJCOImpl.callVerifyToken(Request);
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.registerCustomer",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
 		return RegResponse;
 	}
 
-	public RegistrationResponse verifyAddress(final RegistrationRequest registrationRequest) {
+	public Response verifyAddress(final Request Request) {
 		// secure registerCustomer service on portal
-		RegistrationResponse RegResponseSecure = checkEncryptSession(registrationRequest);
+		Response RegResponseSecure = checkEncryptSession(Request);
 		if (AppConstants.RETURN_UME_FALSE.equals(RegResponseSecure.getReturnUME())) {
 			RegResponseSecure.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
 			return RegResponseSecure;
 		}
 		// secure end this solution would be changed accordingly if web service moves
 		// out from portal
-		RegistrationResponse RegResponse;
+		Response RegResponse;
 		try {
-			RegResponse = portalJCOImpl.callAddressCheck(registrationRequest);
+			RegResponse = portalJCOImpl.callAddressCheck(Request);
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.verifyAddress",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -457,20 +454,19 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.service.PortalDetailsResponse#updatePassword(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * @see com.lp.BOBService.service.PortalDetailsResponse#updatePassword(com.lp.
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse updatePassword(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse;
+	public Response updatePassword(final Request Request) {
+		Response RegResponse;
 		try {
-			RegResponse = portalJCOImpl.callUpdatePassword(registrationRequest);
+			RegResponse = portalJCOImpl.callUpdatePassword(Request);
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.updatePassword",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -482,19 +478,19 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see
 	 * com.lp.BOBService.service.PortalDetailsResponse#verifyEmailActivation(com.
-	 * lp.BOBService.model.RegistrationRequest)
+	 * lp.BOBService.model.Request)
 	 */
-	public RegistrationResponse verifyEmailActivation(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse;
+	public Response verifyEmailActivation(final Request Request) {
+		Response RegResponse;
 		try {
-			RegResponse = portalJCOImpl.callVerifyEmailActivation(registrationRequest);
+			RegResponse = portalJCOImpl.callVerifyEmailActivation(Request);
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 					"PortalDetailsResponseImpl.verifyEmailActivation",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -505,11 +501,10 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.service.PortalDetailsResponse#initialiseUser(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * @see com.lp.BOBService.service.PortalDetailsResponse#initialiseUser(com.lp.
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse initialiseUser(final RegistrationRequest registrationRequest) {
+	public Response initialiseUser(final Request Request) {
 
 		/*
 		 * String ip = httpRequest.getHeader("x-forwarded-for"); if ( null == ip ||
@@ -521,22 +516,21 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		 * 
 		 * SimpleLogger.trace(Severity.INFO,loc,"initialiseUser request :"+ ip );
 		 * 
-		 * if (!PortalServiceUtils.checkIpBlock(ip)){ RegistrationResponse
-		 * RegResponseBlock = new RegistrationResponse();
-		 * RegResponseBlock.setReturnUME(AppConstants.RETURN_UME_FALSE);
+		 * if (!PortalServiceUtils.checkIpBlock(ip)){ Response RegResponseBlock = new
+		 * Response(); RegResponseBlock.setReturnUME(AppConstants.RETURN_UME_FALSE);
 		 * RegResponseBlock.
 		 * setErrReason("This Ip is blocked for a while ,please try again, IP is  " +
 		 * ip); return RegResponseBlock; };
 		 */
 
-		RegistrationResponse RegResponse;
+		Response RegResponse;
 		try {
-			RegResponse = portalUMEImpl.initPortalUser(registrationRequest);
+			RegResponse = portalUMEImpl.initPortalUser(Request);
 
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -548,18 +542,18 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see
 	 * com.lp.BOBService.service.PortalDetailsResponse#verifyInitialUser(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse verifyInitialUser(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse;
+	public Response verifyInitialUser(final Request Request) {
+		Response RegResponse;
 		try {
-			RegResponse = portalUMEImpl.VerifyInitPortalUser(registrationRequest);
+			RegResponse = portalUMEImpl.VerifyInitPortalUser(Request);
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.initialiseUser",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -571,18 +565,18 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see
 	 * com.lp.BOBService.service.PortalDetailsResponse#testJcoconnection(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse testJcoconnection(final RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse;
+	public Response testJcoconnection(final Request Request) {
+		Response RegResponse;
 		try {
-			RegResponse = portalUMEImpl.initPortalUser(registrationRequest);
+			RegResponse = portalUMEImpl.initPortalUser(Request);
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.initialiseUser",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
@@ -594,20 +588,20 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * 
 	 * @see
 	 * com.lp.BOBService.service.PortalDetailsResponse#RegisterEncryptSession(com
-	 * .lp.BOBService.model.RegistrationRequest)
+	 * .lp.BOBService.model.Request)
 	 */
-	public RegistrationResponse registerEncryptSession(final RegistrationRequest registrationRequest) {
+	public Response registerEncryptSession(final Request Request) {
 
-		RegistrationResponse RegResponse;
+		Response RegResponse;
 		try {
-			RegResponse = portalUMEImpl.getEncryptPwd(registrationRequest.getEmailAddress());
+			RegResponse = portalUMEImpl.getEncryptPwd(Request.getEmailAddress());
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 					"PortalDetailsResponseImpl.registerEncryptSession",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 			return RegResponse;
@@ -639,10 +633,10 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * (non-Javadoc)
 	 * 
 	 * @see com.lp.BOBService.service.PortalDetailsResponse#checkEncryptSession
-	 * (com.lp.BOBService.model.RegistrationRequest)
+	 * (com.lp.BOBService.model.Request)
 	 */
-	public RegistrationResponse checkEncryptSession(RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse = new RegistrationResponse();
+	public Response checkEncryptSession(Request Request) {
+		Response RegResponse = new Response();
 		String sessionValue = getEncryptSession();
 		if (sessionValue == null) {
 			RegResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
@@ -650,16 +644,16 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			RegResponse.setErrReason(AppConstants.MSG_SESSION_LOST);
 		} else {
 			try {
-				RegResponse = portalUMEImpl.getEncryptPwd(registrationRequest.getEmailAddress());
-				RegResponse.setGroupType(portalUMEImpl.checkGroup(registrationRequest.getEmailAddress()));
+				RegResponse = portalUMEImpl.getEncryptPwd(Request.getEmailAddress());
+				RegResponse.setGroupType(portalUMEImpl.checkGroup(Request.getEmailAddress()));
 
 			} catch (ConnectorException e) {
 				// TODO Auto-generated catch block
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 						"PortalDetailsResponseImpl.checkEncryptSession",
-						"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+						"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-				RegResponse = new RegistrationResponse();
+				RegResponse = new Response();
 				RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 				RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 				RegResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
@@ -685,12 +679,11 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 * (non-Javadoc)
 	 * 
 	 * @see com.lp.BOBService.service.PortalDetailsResponse#
-	 * checkCompleteRegisterPermission
-	 * (com.lp.BOBService.model.RegistrationRequest)
+	 * checkCompleteRegisterPermission (com.lp.BOBService.model.Request)
 	 */
-	public RegistrationResponse checkCompleteRegisterPermission(RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse = new RegistrationResponse();
-		String logonId = registrationRequest.getEmailAddress();
+	public Response checkCompleteRegisterPermission(Request Request) {
+		Response RegResponse = new Response();
+		String logonId = Request.getEmailAddress();
 		String groupType = portalUMEImpl.checkGroup(logonId);
 		SimpleLogger.trace(Severity.INFO, loc, "checkCompleteRegisterPermission groupType is  :" + groupType);
 		if (groupType.equalsIgnoreCase(AppConstants.SELF_COMPLETED_GROUP_TYPE)
@@ -698,7 +691,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			// additional check for pending group
 			if (groupType.equalsIgnoreCase(AppConstants.SELF_PENDING_GROUP_TYPE)) {
 				if (portalUMEImpl.checkDriverGroup(logonId)) {
-					RegistrationResponse RegResponseUME;
+					Response RegResponseUME;
 					try {
 						RegResponseUME = portalUMEImpl.assignApprovalGroup(logonId);
 						if (AppConstants.RETURN_UME_TRUE.equalsIgnoreCase(RegResponseUME.getReturnUME())) {
@@ -708,8 +701,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 					} catch (ConnectorException ec) {
 						SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 								"PortalDetailsResponseImpl.checkCompleteRegisterPermission",
-								"Call PortalJcoImpl with request of "
-										+ PortalServiceUtils.converToJson(registrationRequest));
+								"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 						SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 
 					}
@@ -722,8 +714,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		if (groupType.equalsIgnoreCase(AppConstants.SELF_COMPLETED_GROUP_TYPE)
 				|| groupType.equalsIgnoreCase(AppConstants.SELF_PENDING_GROUP_TYPE)) {
 			try {
-				RegResponse = portalUMEImpl.validateAccount(registrationRequest.getEmailAddress(),
-						registrationRequest.getPassword());
+				RegResponse = portalUMEImpl.validateAccount(Request.getEmailAddress(), Request.getPassword());
 				if (AppConstants.RETURN_UME_TRUE.equals(RegResponse.getReturnUME())) { // if pass validation ,set
 																						// encryptSession with token
 					httpSession.setAttribute("encryptSession", RegResponse.getToken());
@@ -733,9 +724,9 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				// TODO Auto-generated catch block
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 						"PortalDetailsResponseImpl.checkCompleteRegisterPermission",
-						"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(registrationRequest));
+						"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-				RegResponse = new RegistrationResponse();
+				RegResponse = new Response();
 				RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 				RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 				return RegResponse;
@@ -757,10 +748,9 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				httpResponse.addCookie(logonIdCookie);
 
 				// set session for security
-				RegistrationResponse RegResponseValidateAccount = new RegistrationResponse();
+				Response RegResponseValidateAccount = new Response();
 				try {
-					RegResponseValidateAccount = portalUMEImpl.validateAccount(logonId,
-							registrationRequest.getPassword());
+					RegResponseValidateAccount = portalUMEImpl.validateAccount(logonId, Request.getPassword());
 					if (AppConstants.RETURN_UME_TRUE.equals(RegResponseValidateAccount.getReturnUME())) { // if pass
 																											// validation
 																											// ,set
@@ -773,8 +763,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				} catch (ConnectorException e) {
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 							"PortalDetailsResponseImpl.checkCompleteRegisterPermission.checkAccountValidation-initial",
-							"Call PortalJcoImpl with request of "
-									+ PortalServiceUtils.converToJson(registrationRequest));
+							"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 					;
 				}
@@ -784,16 +773,14 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			// as approval group first login set department as "Driver" for indicator as
 			// user login
 			if (groupType.equalsIgnoreCase(AppConstants.SELF_APPROVAL_GROUP_TYPE)) {
-				RegistrationResponse RegResponseValidateAccount = new RegistrationResponse();
+				Response RegResponseValidateAccount = new Response();
 				try {
 
-					RegResponseValidateAccount = portalUMEImpl.validateAccount(logonId,
-							registrationRequest.getPassword());
+					RegResponseValidateAccount = portalUMEImpl.validateAccount(logonId, Request.getPassword());
 				} catch (ConnectorException e) {
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 							"PortalDetailsResponseImpl.checkCompleteRegisterPermission.checkAccountValidation-Approval",
-							"Call PortalJcoImpl with request of "
-									+ PortalServiceUtils.converToJson(registrationRequest));
+							"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 				}
 				if (AppConstants.RETURN_UME_TRUE.equals(RegResponseValidateAccount.getReturnUME())) { // if pass
@@ -850,29 +837,25 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 
 	@Override
 	// services/data/v20.0/sobjects/Account/
-	public RegistrationResponse callSalesforceNZ(RegistrationRequest registrationRequest) {
-		// System.setProperty("https.proxyHost", "10.19.21.1");
-		// System.setProperty("https.proxyPort", "8080");
-
+	public Response callSalesforceNZ(Request Request) {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
 		HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
 		RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
 
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 
 		try {
-			String queryURL = registrationRequest.getSalesforceInstanceUrl() + "/services/data/v20.0/sobjects/Account/";
+			String queryURL = Request.getSalesforceInstanceUrl() + "/services/data/v20.0/sobjects/Account/";
 			SimpleLogger.trace(Severity.INFO, loc,
-					"queryURL  is :" + queryURL + "with token is " + registrationRequest.getSalesforceAccessToken());
+					"queryURL  is :" + queryURL + "with token is " + Request.getSalesforceAccessToken());
 			HttpGet httpGet = new HttpGet(queryURL);
 
 			SimpleLogger.trace(Severity.INFO, loc,
 					"Executing request " + httpGet.getRequestLine() + " to " + target + " via " + proxy);
 			httpGet.setConfig(config);
 
-			Header oauthHeader = new BasicHeader("Authorization",
-					"Bearer " + registrationRequest.getSalesforceAccessToken());
+			Header oauthHeader = new BasicHeader("Authorization", "Bearer " + Request.getSalesforceAccessToken());
 			Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
 			httpGet.addHeader(oauthHeader);
 			httpGet.addHeader(prettyPrintHeader);
@@ -950,7 +933,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	}
 
 	@Override
-	public RegistrationResponse getAccessToken(String code) {
+	public Response getAccessToken(String code) {
 		// System.setProperty("https.proxyHost", "10.19.21.1");
 		// System.setProperty("https.proxyPort", "8080");
 
@@ -958,7 +941,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
 		HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
 		RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 		try {
 			String requireTokenURL = AppConstants.SALESFORCE_SITE + AppConstants.SALESFORCE_OAUTH2
 					+ "?grant_type=authorization_code&code=" + code + "&client_id=" + AppConstants.CUST_KEY
@@ -1028,30 +1011,23 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	}
 
 	@Override
-	public RegistrationResponse createSalesforceNZ(RegistrationRequest registrationRequest) {
+	public Response createSalesforceNZ(Request Request) {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
 		HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
 		RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 		try {
-
-			String createAccountURL = registrationRequest.getSalesforceInstanceUrl()
-					+ "/services/data/v20.0/sobjects/Account/";
-
+			String createAccountURL = Request.getSalesforceInstanceUrl() + "/services/data/v20.0/sobjects/Account/";
 			SimpleLogger.trace(Severity.INFO, loc, "createAccountURL  :" + createAccountURL);
-
 			JSONObject lead = new JSONObject();
-			lead.put("Name", registrationRequest.getFirstName());
-
+			lead.put("Name", Request.getFirstName());
 			HttpPost httpPost = new HttpPost(createAccountURL);
 			SimpleLogger.trace(Severity.INFO, loc,
 					"Executing request " + httpPost.getRequestLine() + " to " + target + " via " + proxy);
 
 			httpPost.setConfig(config);
-
-			Header oauthHeader = new BasicHeader("Authorization",
-					"Bearer " + registrationRequest.getSalesforceAccessToken());
+			Header oauthHeader = new BasicHeader("Authorization", "Bearer " + Request.getSalesforceAccessToken());
 			Header contentType = new BasicHeader("Content-Type", "application/json");
 
 			StringEntity body = new StringEntity(lead.toString(1));
@@ -1099,18 +1075,18 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	}
 
 	@Override
-	public RegistrationResponse getDrivers(RegistrationRequest registrationRequest) {
+	public Response getDrivers(Request Request) {
 
 		Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
 		HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
 		/// RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 		try {
 
 			String fetchDriversURL = "http://10.19.6.12:8184/lpnzsrxs/rxsrtr/vehicles?clientNumber="
-					+ registrationRequest.getCustomerNumber() + "&limit=10";
+					+ Request.getCustomerNumber() + "&limit=10";
 			SimpleLogger.trace(Severity.INFO, loc, "fetchDriversURL  :" + fetchDriversURL);
 
 			HttpGet httpGet = new HttpGet(fetchDriversURL);
@@ -1192,18 +1168,47 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	}
 
 	@Override
-	public RegistrationResponse resetPassword(RegistrationRequest registrationRequest) {
-		RegistrationResponse RegResponse;
+	public Response resetPassword(Request Request) {
+		Response RegResponse;
 		try {
-			RegResponse = portalUMEImpl.resetPassword(registrationRequest);
+			RegResponse = portalUMEImpl.resetPassword(Request);
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
-			RegResponse = new RegistrationResponse();
+			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 		}
 		return RegResponse;
+	}
+
+	@Override
+	public Response validateAccount(String logonId, String password) {
+		// TODO Auto-generated method stub
+		Response response = new Response();
+		AuthUser authUser = new AuthUser();
+		try {
+			Response res = portalUMEImpl.validateAccount(logonId, password);
+			authUser.setAuthentication(res.getReturnUME());
+			authUser.setLogonId(logonId);
+			authUser.setEmailAddress(res.getEmailAddress());
+			authUser.setStatus(res.getErrCode());
+			response.setAuthUser(authUser);
+		} catch (ConnectorException e) {
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
+					"PortalDetailsResponseImpl.checkAccountValidation",
+					"Call PortalJcoImpl with request of " + logonId);
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
+			authUser.setAuthentication(AppConstants.RETURN_UME_FALSE);
+			authUser.setStatus(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			authUser.setLogonId(logonId);
+			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setAuthUser(authUser);
+			
+		}
+		return response;
+
 	}
 
 }

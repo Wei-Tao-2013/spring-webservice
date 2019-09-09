@@ -188,13 +188,7 @@
 			<artifactId>auth0-spring-security-api</artifactId>
 			<version>1.2.5</version>
 		</dependency>
-		<!--
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-			<version>3.8.2</version>
-		</dependency>
--->
+		
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -202,7 +196,13 @@
 			<version>1.9</version>
 		</dependency>
 
-
+		   <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+            <scope>provided</scope>
+        </dependency>
 
 	</dependencies>
 
@@ -257,8 +257,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.2.2</version>
 				<configuration>
-					<outputDirectory>C:\apache-tomcat-8.0.47\webapps</outputDirectory>
-					<!--<outputDirectory>H:\deployment</outputDirectory>-->
+					<!--<outputDirectory>C:\apache-tomcat-8.0.47\webapps</outputDirectory>-->
+					<outputDirectory>H:\deployment</outputDirectory>
 					<warName>BOBService</warName>
 				</configuration>
 			</plugin>

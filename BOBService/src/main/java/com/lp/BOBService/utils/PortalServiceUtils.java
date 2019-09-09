@@ -4,31 +4,24 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+
+import com.google.gson.Gson;
+import com.sap.tc.logging.Location;
+import com.sap.tc.logging.Severity;
+import com.sap.tc.logging.SimpleLogger;
 
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-
-import com.google.gson.Gson;
-import com.lp.BOBService.service.impl.PortalDetailsResponseImpl;
-import com.sap.tc.logging.Category;
-import com.sap.tc.logging.Location;
-import com.sap.tc.logging.Severity;
-import com.sap.tc.logging.SimpleLogger;
 
 public class PortalServiceUtils {
 	private static final Location loc = Location.getLocation(PortalServiceUtils.class);
@@ -86,11 +79,6 @@ public class PortalServiceUtils {
 
 	private static JSONObject postAndParseJSON(URL url, String postData) throws IOException {
 
-		// Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.19.21.1",
-		// 8080));
-		System.setProperty("https.proxyHost", "10.19.21.1");
-		System.setProperty("https.proxyPort", "8080");
-		//System.setProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 		urlConnection.setDoOutput(true);
 		urlConnection.setRequestMethod("POST");

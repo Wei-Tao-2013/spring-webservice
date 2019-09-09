@@ -8,23 +8,23 @@ public class AppConstants implements Serializable {
 	private static final long serialVersionUID = -3378732900839934764L;
 
 	/** System Exceptions **/
-	public static final String ERROR_CODE_JCO_EXCETPION = "0999";
-	public static final String ERROR_CODE_UserAlreadyExistsException = "0998";
-	public static final String ERROR_CODE_UserAccountAlreadyExistsException = "0997";
-	public static final String ERROR_CODE_UMException = "0996";
-	public static final String ERROR_CODE_UMRuntimeException = "0995";
-	public static final String ERROR_CODE_NoSuchRoleException = "0994";
-	public static final String ERROR_CODE_NoSuchUserException = "0993";
-	public static final String ERROR_CODE_NoSuchUserAccountException = "0992";
-	public static final String ERROR_CODE_AttributeValueAlreadyExistsException = "0991";
+	public static final String ERROR_CODE_JCO_EXCETPION = "JCO_EXCETPION";
+	public static final String ERROR_CODE_UserAlreadyExistsException = "UserAlreadyExistsException";
+	public static final String ERROR_CODE_UserAccountAlreadyExistsException = "UserAccountAlreadyExistsException";
+	public static final String ERROR_CODE_UMException = "UMException";
+	public static final String ERROR_CODE_UMRuntimeException = "UMRuntimeException";
+	public static final String ERROR_CODE_NoSuchRoleException = "NoSuchRoleException";
+	public static final String ERROR_CODE_NoSuchUserException = "NoSuchUserException";
+	public static final String ERROR_CODE_NoSuchUserAccountException = "NoSuchUserAccountException";
+	public static final String ERROR_CODE_AttributeValueAlreadyExistsException = "AttributeValueAlreadyExistsException";
 
 	/** Business errors **/
-	public static final String ERROR_CODE_LoginIDNotFound = "0090";
-	public static final String ERROR_CODE_SESSIONLOST = "0089";
-	public static final String ERROR_CODE_INCORRECT_ENCRYPTPWD = "0088";
-	public static final String ERROR_CODE_PERMISSION_DENY = "0087";
-	public static final String ERROR_CODE_INCORRECT_PWD = "0086";
-	public static final String ERROR_CODE_DUPLIATED_USER = "0085";
+	public static final String ERROR_CODE_LoginIDNotFound = "LoginIDNotFound";
+	public static final String ERROR_CODE_SESSIONLOST = "SESSIONLOST";
+	public static final String ERROR_CODE_INCORRECT_ENCRYPTPWD = "INCORRECT_ENCRYPTPWD";
+	public static final String ERROR_CODE_PERMISSION_DENY = "PERMISSION_DENY";
+	public static final String ERROR_CODE_INCORRECT_PWD = "INCORRECT_PWD";
+	public static final String ERROR_CODE_DUPLIATED_USER = "DUPLIATED_USER";
 
 	/** Application Status Setting **/
 	public static final String RETURN_UME_TRUE = "true";

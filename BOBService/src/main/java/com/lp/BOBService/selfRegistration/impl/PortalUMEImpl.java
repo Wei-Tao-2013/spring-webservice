@@ -3,8 +3,8 @@ package com.lp.BOBService.selfRegistration.impl;
 import com.lp.connector.exception.ConnectorException;
 import com.lp.connector.model.SAPConnectorRequest;
 import com.lp.connector.model.SAPConnectorResponse;
-import com.lp.BOBService.model.RegistrationRequest;
-import com.lp.BOBService.model.RegistrationResponse;
+import com.lp.BOBService.model.Request;
+import com.lp.BOBService.model.Response;
 import com.lp.BOBService.selfRegistration.PortalJCO;
 import com.lp.BOBService.selfRegistration.PortalUME;
 import com.lp.BOBService.utils.AppConstants;
@@ -50,15 +50,15 @@ public class PortalUMEImpl implements PortalUME {
 	private PortalJCO portalJCO;
 
 	@Override
-	public RegistrationResponse initPortalUser(RegistrationRequest registrationReq) throws ConnectorException {
+	public Response initPortalUser(Request registrationReq) throws ConnectorException {
 		// TODO Auto-generated method stub
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		sapReq = (SAPConnectorRequest) PortalServiceUtils.copyProperties(registrationReq, sapReq);
-		RegistrationRequest requestLog = new RegistrationRequest();
-		requestLog = (RegistrationRequest) PortalServiceUtils.copyProperties(registrationReq, requestLog);
+		Request requestLog = new Request();
+		requestLog = (Request) PortalServiceUtils.copyProperties(registrationReq, requestLog);
 		requestLog.setPassword("####");
 		SAPConnectorResponse sapResponse = null;
-		RegistrationResponse regResponse = null;
+		Response regResponse = null;
 		// check if this user account is allowed by CRM
 		regResponse = portalJCO.callInitAllowEmail(registrationReq);
 		if (!"true".equalsIgnoreCase(regResponse.getReturnCRM())) {
@@ -214,14 +214,14 @@ public class PortalUMEImpl implements PortalUME {
 	 * 
 	 * @see
 	 * com.lp.BOBService.selfRegistration.PortalUME#VerifyInitPortalUser(com.lp.
-	 * BOBService.model.RegistrationRequest)
+	 * BOBService.model.Request)
 	 */
-	public RegistrationResponse VerifyInitPortalUser(RegistrationRequest registrationReq) throws ConnectorException {
+	public Response VerifyInitPortalUser(Request registrationReq) throws ConnectorException {
 		// TODO Auto-generated method stub
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		sapReq = (SAPConnectorRequest) PortalServiceUtils.copyProperties(registrationReq, sapReq);
 		SAPConnectorResponse sapResponse = null;
-		RegistrationResponse regResponse = null;
+		Response regResponse = null;
 		boolean verifycation = false;
 		PortalJCO portalJCO = new PortalJCOImpl();
 		try {
@@ -325,9 +325,9 @@ public class PortalUMEImpl implements PortalUME {
 	 * @param sapResponse
 	 * @return regResponse
 	 */
-	private RegistrationResponse convertJcoResponse(SAPConnectorResponse sapResponse) {
-		RegistrationResponse regResponse = new RegistrationResponse();
-		regResponse = (RegistrationResponse) PortalServiceUtils.copyProperties(sapResponse, regResponse);
+	private Response convertJcoResponse(SAPConnectorResponse sapResponse) {
+		Response regResponse = new Response();
+		regResponse = (Response) PortalServiceUtils.copyProperties(sapResponse, regResponse);
 		return regResponse;
 	}
 
@@ -395,8 +395,7 @@ public class PortalUMEImpl implements PortalUME {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalUME#updateUserDepartment(java.
+	 * @see com.lp.BOBService.selfRegistration.PortalUME#updateUserDepartment(java.
 	 * lang.String)
 	 */
 	public void updateUserDepartment(String logonId) {
@@ -538,8 +537,7 @@ public class PortalUMEImpl implements PortalUME {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalUME#checkDriverGroup(java.lang.
+	 * @see com.lp.BOBService.selfRegistration.PortalUME#checkDriverGroup(java.lang.
 	 * String)
 	 */
 	public boolean checkDriverGroup(String logonId) {
@@ -607,9 +605,9 @@ public class PortalUMEImpl implements PortalUME {
 
 	}
 
-	public RegistrationResponse assignPendingGroup(String LoginId) {
+	public Response assignPendingGroup(String LoginId) {
 		SAPConnectorResponse sapResponse = null;
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 		try {
 			this.assignPortalGroupRole(LoginId, AppConstants.SELF_PENDING_GROUP, true);
 		} catch (NoSuchUserException | NoSuchUserAccountException nsuex) {
@@ -659,7 +657,7 @@ public class PortalUMEImpl implements PortalUME {
 			regResponse = convertJcoResponse(sapResponse);
 			return regResponse;
 		}
-		regResponse = new RegistrationResponse();
+		regResponse = new Response();
 		regResponse.setReturnUME(AppConstants.RETURN_UME_TRUE);
 		return regResponse;
 
@@ -672,9 +670,9 @@ public class PortalUMEImpl implements PortalUME {
 	 * com.lp.BOBService.selfRegistration.PortalUME#assignApprovalGroup(java.lang
 	 * .String)
 	 */
-	public RegistrationResponse assignApprovalGroup(String LoginId) {
+	public Response assignApprovalGroup(String LoginId) {
 		SAPConnectorResponse sapResponse = null;
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 		try {
 			this.assignPortalGroupRole(LoginId, AppConstants.SELF_APPROVAL_GROUP, true);
 		} catch (NoSuchUserException | NoSuchUserAccountException nsuex) {
@@ -724,7 +722,7 @@ public class PortalUMEImpl implements PortalUME {
 			regResponse = convertJcoResponse(sapResponse);
 			return regResponse;
 		}
-		regResponse = new RegistrationResponse();
+		regResponse = new Response();
 		regResponse.setReturnUME(AppConstants.RETURN_UME_TRUE);
 		return regResponse;
 
@@ -819,11 +817,11 @@ public class PortalUMEImpl implements PortalUME {
 	 * @param pwd
 	 * @return
 	 */
-	public RegistrationResponse validateAccount(String logonId, String pwd) {
+	public Response validateAccount(String logonId, String pwd) {
 		String method = "PortalUMEImpl-validateAccount";
 		SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters :" + logonId);
 		SAPConnectorResponse sapResponse = new SAPConnectorResponse();
-		RegistrationResponse regResponse = null;
+		Response regResponse = null;
 		IUserAccountFactory userAccountFactory = UMFactory.getUserAccountFactory();
 		IUserFactory userFactory = UMFactory.getUserFactory();
 		try {
@@ -839,10 +837,8 @@ public class PortalUMEImpl implements PortalUME {
 			} else {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setErrCode(AppConstants.ERROR_CODE_INCORRECT_PWD);
-
 				if (iCheckPwd == ILoginConstants.CHECKPWD_PWDLOCKED) {
 					sapResponse.setErrReason(AppConstants.MSG_LOGON_PWD_LOCKED);
-
 				} else if (iCheckPwd == ILoginConstants.CHECKPWD_PWDEXPIRED) {
 					sapResponse.setErrReason(AppConstants.MSG_LOGON_PWD_EXPIRED);
 				} else {
@@ -850,8 +846,7 @@ public class PortalUMEImpl implements PortalUME {
 				}
 				SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters User id :" + logonId
 						+ " password failed as " + sapResponse.getErrReason());
-			}
-			;
+			};
 
 		} catch (NoSuchUserAccountException ex) {
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
@@ -878,11 +873,11 @@ public class PortalUMEImpl implements PortalUME {
 	 * @see com.lp.BOBService.selfRegistration.PortalUME#getEncryptPwd(java.lang.
 	 * String)
 	 */
-	public RegistrationResponse getEncryptPwd(String logonId) throws ConnectorException {
+	public Response getEncryptPwd(String logonId) throws ConnectorException {
 		String method = "PortalUMEImpl-getEncrptPwd";
 		SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters :" + logonId);
 		SAPConnectorResponse sapResponse = new SAPConnectorResponse();
-		RegistrationResponse regResponse = null;
+		Response regResponse = null;
 		IUserAccountFactory userAccountFactory = UMFactory.getUserAccountFactory();
 		String encryptPwd = "";
 		try {
@@ -919,15 +914,15 @@ public class PortalUMEImpl implements PortalUME {
 	}
 
 	@Override
-	public RegistrationResponse resetPassword(RegistrationRequest registrationReq) throws ConnectorException {
+	public Response resetPassword(Request registrationReq) throws ConnectorException {
 		// TODO Auto-generated method stub
 
-		RegistrationRequest requestLog = new RegistrationRequest();
-		requestLog = (RegistrationRequest) PortalServiceUtils.copyProperties(registrationReq, requestLog);
+		Request requestLog = new Request();
+		requestLog = (Request) PortalServiceUtils.copyProperties(registrationReq, requestLog);
 		requestLog.setPassword("####");
 		requestLog.setNewPassword("####");
 
-		RegistrationResponse regResponse = null;
+		Response regResponse = null;
 		SimpleLogger.trace(Severity.INFO, loc, "Call resetPassword from PortalUMEImpl with Json request "
 				+ PortalServiceUtils.converToJson(requestLog));
 
@@ -949,10 +944,9 @@ public class PortalUMEImpl implements PortalUME {
 
 	}
 
-	private RegistrationResponse updatePassword(String logonId, String newPassword)
-			throws UMException, UMRuntimeException {
+	private Response updatePassword(String logonId, String newPassword) throws UMException, UMRuntimeException {
 		String method = "PortalUMEImpl-resetPassword";
-		RegistrationResponse regResponse = new RegistrationResponse();
+		Response regResponse = new Response();
 		IUserAccountFactory userAccountFactory = UMFactory.getUserAccountFactory();
 		IUserAccount userAccount = userAccountFactory.getUserAccountByLogonId(logonId);
 		IUserAccount mAccnt = userAccountFactory.getMutableUserAccount(userAccount.getUniqueID());

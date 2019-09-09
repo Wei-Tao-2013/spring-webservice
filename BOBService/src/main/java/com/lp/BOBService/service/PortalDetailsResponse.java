@@ -1,35 +1,35 @@
 package com.lp.BOBService.service;
 
-import com.lp.BOBService.model.RegistrationRequest;
-import com.lp.BOBService.model.RegistrationResponse;
+import com.lp.BOBService.model.Request;
+import com.lp.BOBService.model.Response;
 
 public interface PortalDetailsResponse {
 
-	RegistrationResponse checkEmail(RegistrationRequest registrationRequest);
+	Response checkEmail(Request Request);
 
-	RegistrationResponse checkCustomerNumber(RegistrationRequest registrationRequest);
+	Response checkCustomerNumber(Request Request);
 
-	RegistrationResponse validateWorkEmail(RegistrationRequest registrationRequest);
+	Response validateWorkEmail(Request Request);
 
-	RegistrationResponse registerCustomer(RegistrationRequest registrationRequest);
+	Response registerCustomer(Request Request);
 
-	RegistrationResponse testJcoconnection(RegistrationRequest registrationRequest);
+	Response testJcoconnection(Request Request);
 
-	RegistrationResponse initialiseUser(RegistrationRequest registrationRequest);
+	Response initialiseUser(Request Request);
 
-	RegistrationResponse verifyInitialUser(RegistrationRequest registrationRequest);
+	Response verifyInitialUser(Request Request);
 
-	RegistrationResponse verifyToken(RegistrationRequest registrationRequest);
+	Response verifyToken(Request Request);
 
-	RegistrationResponse verifyAddress(RegistrationRequest registrationRequest);
+	Response verifyAddress(Request Request);
 
-	RegistrationResponse updatePassword(RegistrationRequest registrationRequest);
+	Response updatePassword(Request Request);
 
-	RegistrationResponse resetPassword(RegistrationRequest registrationRequest);
+	Response resetPassword(Request Request);
 
-	RegistrationResponse verifyEmailActivation(RegistrationRequest registrationRequest);
+	Response verifyEmailActivation(Request Request);
 
-	RegistrationResponse registerEncryptSession(RegistrationRequest registrationRequest);
+	Response registerEncryptSession(Request Request);
 
 	String getEncryptSession();
 
@@ -37,23 +37,25 @@ public interface PortalDetailsResponse {
 
 	void switchGoogleAPI(String indicator);
 
-	RegistrationResponse checkEncryptSession(RegistrationRequest registrationRequest);
+	Response checkEncryptSession(Request Request);
 
-	RegistrationResponse checkCompleteRegisterPermission(RegistrationRequest registrationRequest);
+	Response checkCompleteRegisterPermission(Request Request);
+
+	Response validateAccount(String loginId,String password);
 
 	String getGoogleGeoTest(String request);
 
-	RegistrationResponse sendVerifyEmail();
+	Response sendVerifyEmail();
 
-	RegistrationResponse validateRecaptcha(RegistrationRequest registrationRequest);
+	Response validateRecaptcha(Request Request);
 
 	// poc of integration of NZ
-	RegistrationResponse getAccessToken(String code);
+	Response getAccessToken(String code);
 
-	RegistrationResponse callSalesforceNZ(RegistrationRequest registrationRequest);
+	Response callSalesforceNZ(Request Request);
 
-	RegistrationResponse createSalesforceNZ(RegistrationRequest registrationRequest);
+	Response createSalesforceNZ(Request Request);
 
-	RegistrationResponse getDrivers(RegistrationRequest registrationRequest);
+	Response getDrivers(Request Request);
 
 }

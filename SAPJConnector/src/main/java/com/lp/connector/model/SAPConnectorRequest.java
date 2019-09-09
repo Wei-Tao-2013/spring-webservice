@@ -59,7 +59,7 @@ public class SAPConnectorRequest implements java.io.Serializable {
 	/**
 	 * convert request object to string
 	 * 
-	 * @return the registrationRequest as Json format
+	 * @return the Request as Json format
 	 */
 
 	/**

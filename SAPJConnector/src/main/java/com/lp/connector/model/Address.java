@@ -1,4 +1,6 @@
 package com.lp.connector.model;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Request Object of jco  
@@ -6,7 +8,7 @@ package com.lp.connector.model;
  * @author taowe
  * @since  10-Nov-2016
  */
-
+@Data @NoArgsConstructor
 public class Address implements java.io.Serializable {
 
 	/** For serialization. */

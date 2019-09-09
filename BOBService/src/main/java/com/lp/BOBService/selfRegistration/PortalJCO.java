@@ -1,46 +1,46 @@
 package com.lp.BOBService.selfRegistration;
 
 import com.lp.connector.exception.ConnectorException;
-import com.lp.BOBService.model.RegistrationRequest;
-import com.lp.BOBService.model.RegistrationResponse;
+import com.lp.BOBService.model.Request;
+import com.lp.BOBService.model.Response;
 
 public abstract interface PortalJCO {
 
-	public abstract RegistrationResponse callCustomerValidation(RegistrationRequest paramRegistration)
+	public abstract Response callCustomerValidation(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callMandatoryIndicator(RegistrationRequest paramRegistration)
+	public abstract Response callMandatoryIndicator(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callCustomerRegistration(RegistrationRequest paramRegistration)
+	public abstract Response callCustomerRegistration(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callWorkEamilValiation(RegistrationRequest paramRegistration)
+	public abstract Response callWorkEamilValiation(Request paramRegistration)
 			throws ConnectorException;
 
 	/*
-	 * public abstract RegistrationResponse initPortalUser( RegistrationRequest
+	 * public abstract Response initPortalUser( Request
 	 * paramRegistration) throws ConnectorException;
 	 */
 
-	public abstract RegistrationResponse callInitEmailVerification(RegistrationRequest registrationReq)
+	public abstract Response callInitEmailVerification(Request registrationReq)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callVerifyToken(RegistrationRequest paramRegistration)
+	public abstract Response callVerifyToken(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callAddressCheck(RegistrationRequest paramRegistration)
+	public abstract Response callAddressCheck(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callVerifyEmailActivation(RegistrationRequest paramRegistration)
+	public abstract Response callVerifyEmailActivation(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse callUpdatePassword(RegistrationRequest paramRegistration)
+	public abstract Response callUpdatePassword(Request paramRegistration)
 			throws ConnectorException;
 
-	public abstract RegistrationResponse testJcoCall(RegistrationRequest paramRegistration) throws ConnectorException;
+	public abstract Response testJcoCall(Request paramRegistration) throws ConnectorException;
 
-	public abstract RegistrationResponse callInitAllowEmail(RegistrationRequest paramRegistration)
+	public abstract Response callInitAllowEmail(Request paramRegistration)
 			throws ConnectorException;
 
 }
