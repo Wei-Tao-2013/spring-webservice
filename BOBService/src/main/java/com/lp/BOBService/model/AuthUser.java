@@ -18,7 +18,7 @@ public class AuthUser implements java.io.Serializable {
 	private static final long serialVersionUID = 2106633320939583666L;
 
 	private String userName;
-	private String logonId;
+	private String loginId;
 	private String emailAddress;
 	private String authentication; // true vs false
 	private String status;

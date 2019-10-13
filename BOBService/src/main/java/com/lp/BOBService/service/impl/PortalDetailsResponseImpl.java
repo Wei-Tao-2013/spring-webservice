@@ -24,7 +24,6 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.GeocodingResult;
-import com.lp.connector.exception.ConnectorException;
 import com.lp.BOBService.model.AuthUser;
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
@@ -34,6 +33,7 @@ import com.lp.BOBService.service.PortalDetailsResponse;
 import com.lp.BOBService.utils.AppConstants;
 import com.lp.BOBService.utils.AppData;
 import com.lp.BOBService.utils.PortalServiceUtils;
+import com.lp.connector.exception.ConnectorException;
 import com.sap.security.api.IUserMaint;
 import com.sap.security.api.UMException;
 import com.sap.tc.logging.Category;
@@ -1029,7 +1029,6 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			httpPost.setConfig(config);
 			Header oauthHeader = new BasicHeader("Authorization", "Bearer " + Request.getSalesforceAccessToken());
 			Header contentType = new BasicHeader("Content-Type", "application/json");
-
 			StringEntity body = new StringEntity(lead.toString(1));
 			body.setContentType("application/json");
 			httpPost.setEntity(body);
@@ -1079,9 +1078,11 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 
 		Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
 		HttpClient client = HttpClientBuilder.create().build();
-		HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
-		HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
-		/// RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+
+		//	HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
+		//	HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
+		// RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+
 		Response regResponse = new Response();
 		try {
 
@@ -1090,9 +1091,10 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			SimpleLogger.trace(Severity.INFO, loc, "fetchDriversURL  :" + fetchDriversURL);
 
 			HttpGet httpGet = new HttpGet(fetchDriversURL);
-			SimpleLogger.trace(Severity.INFO, loc,
-					"Executing request " + httpGet.getRequestLine() + " via proxy " + proxy);
-			// httpGet.setConfig(config);
+		
+			//	SimpleLogger.trace(Severity.INFO, loc,
+			//	"Executing request " + httpGet.getRequestLine() + " via proxy " + proxy);
+			//  httpGet.setConfig(config);
 
 			httpGet.addHeader(prettyPrintHeader);
 
@@ -1116,6 +1118,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 
 			JSONObject jObject = new JSONObject(response_string);
 			JSONArray recentItems = jObject.getJSONArray("vehicles");
+
 			/*
 			 * Iterator<?> keys = jObject.keys();
 			 * 
@@ -1124,6 +1127,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			 * 
 			 * 
 			 */
+
 			Iterator<Object> iteratorRecentItems = recentItems.iterator();
 			HashMap<String, List<?>> map = new HashMap<String, List<?>>();
 			List<String> accountObjlist = new ArrayList<String>();
@@ -1183,32 +1187,30 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	}
 
 	@Override
-	public Response validateAccount(String logonId, String password) {
+	public Response validateAccount(String loginId, String password) {
 		// TODO Auto-generated method stub
 		Response response = new Response();
 		AuthUser authUser = new AuthUser();
 		try {
-			Response res = portalUMEImpl.validateAccount(logonId, password);
+			Response res = portalUMEImpl.validateAccount(loginId, password);
 			authUser.setAuthentication(res.getReturnUME());
-			authUser.setLogonId(logonId);
-			authUser.setEmailAddress(res.getEmailAddress());
+			authUser.setLoginId(loginId);
+			authUser.setEmailAddress(loginId);
 			authUser.setStatus(res.getErrCode());
 			response.setAuthUser(authUser);
 		} catch (ConnectorException e) {
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 					"PortalDetailsResponseImpl.checkAccountValidation",
-					"Call PortalJcoImpl with request of " + logonId);
+					"Call PortalJcoImpl with request of " + loginId);
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			authUser.setAuthentication(AppConstants.RETURN_UME_FALSE);
 			authUser.setStatus(AppConstants.ERROR_CODE_JCO_EXCETPION);
-			authUser.setLogonId(logonId);
+			authUser.setLoginId(loginId);
 			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			response.setErrReason(AppConstants.CALL_LEASEPLAN);
 			response.setAuthUser(authUser);
-			
 		}
 		return response;
-
 	}
 
 }

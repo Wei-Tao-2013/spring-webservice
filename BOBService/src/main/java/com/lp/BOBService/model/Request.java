@@ -16,7 +16,6 @@ public class Request implements java.io.Serializable {
 	/** For serialization. */
 	private static final long serialVersionUID = 8918238123163132092L;
 	
-
 	private String customerUID;
 	private String logonId;
 	private String emailAddress;

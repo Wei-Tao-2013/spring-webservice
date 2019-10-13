@@ -30,15 +30,13 @@ public class BOBController {
 	private PortalDetailsResponse portalDetailsResponse;
 
 	@RequestMapping(value = "/ume/api/resetPassword", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody Response resetPassword(@RequestBody Request Request)
-			throws Throwable {
+	public @ResponseBody Response resetPassword(@RequestBody Request Request) throws Throwable {
 		Response regResponse = portalDetailsResponse.resetPassword(Request);
 		return regResponse;
 	}
 
 	@RequestMapping(value = "/ume/api/passwordstate/password", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody Response changePassword(@RequestBody Request Request)
-			throws Throwable {
+	public @ResponseBody Response changePassword(@RequestBody Request Request) throws Throwable {
 		Response regResponse = portalDetailsResponse.resetPassword(Request);
 		return regResponse;
 
@@ -46,34 +44,29 @@ public class BOBController {
 
 	// services/data/v20.0/sobjects/Account/
 	@RequestMapping(value = "/ume/api/callSalesforceNZ", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody Response callSalesforceNZ(@RequestBody Request Request)
-			throws Throwable {
+	public @ResponseBody Response callSalesforceNZ(@RequestBody Request Request) throws Throwable {
 		Response regResponse = portalDetailsResponse.callSalesforceNZ(Request);
 		return regResponse;
 	}
 
 	// services/data/v20.0/sobjects/Account/
 	@RequestMapping(value = "/ume/api/createSalesforceNZ", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody Response createSalesforceNZ(@RequestBody Request Request)
-			throws Throwable {
+	public @ResponseBody Response createSalesforceNZ(@RequestBody Request Request) throws Throwable {
 		Response regResponse = portalDetailsResponse.createSalesforceNZ(Request);
 		return regResponse;
 	}
 
 	// access nz data
 	@RequestMapping(value = "/ume/api/drivers", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody Response getDrivers(@RequestBody Request Request)
-			throws Throwable {
+	public @ResponseBody Response getDrivers(@RequestBody Request Request) throws Throwable {
 		Response regResponse = portalDetailsResponse.getDrivers(Request);
 
 		return regResponse;
 	}
 
 	@RequestMapping(value = "/ume/api/getAccessToken", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody Response getAccessToken(@RequestBody Request Request)
-			throws Throwable {
-		Response regResponse = portalDetailsResponse
-				.getAccessToken(Request.getSalesforceAuthCode());
+	public @ResponseBody Response getAccessToken(@RequestBody Request Request) throws Throwable {
+		Response regResponse = portalDetailsResponse.getAccessToken(Request.getSalesforceAuthCode());
 		return regResponse;
 	}
 
@@ -86,14 +79,16 @@ public class BOBController {
 	@RequestMapping(value = "/ume/public/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String publicEndpoint() {
-		return new JSONObject().put("message", "All good. You DO NOT need to be authenticated to call /api/public via proxy and port --> " +  System.getProperty("https.proxyHost") + ":" + System.getProperty("https.proxyPort"))
+		return new JSONObject()
+				.put("message",
+						"All good! You DO NOT need to be authenticated to call /api/public via proxy and port --> "
+								+ System.getProperty("https.proxyHost") + ":" + System.getProperty("https.proxyPort"))
 				.toString();
 	}
 
-
 	@RequestMapping(value = "/ume/public/authentication/{loginId}/{password}", method = RequestMethod.GET, headers = "Accept=application/json")
-	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId,@PathVariable("password") String password)
-			throws Throwable {
+	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId,
+			@PathVariable("password") String password) throws Throwable {
 		Response regResponse = portalDetailsResponse.validateAccount(loginId, password);
 		return regResponse;
 	}
@@ -101,7 +96,7 @@ public class BOBController {
 	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String privateEndpoint() {
-		//System.out.println("system proxy" + System.getProperty("https.proxyHost"));
+		// System.out.println("system proxy" + System.getProperty("https.proxyHost"));
 		return new JSONObject().put("message", "All good. You can see this because you are Authenticated.").toString();
 	}
 

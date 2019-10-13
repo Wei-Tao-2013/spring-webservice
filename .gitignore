@@ -5,6 +5,7 @@
 SAPJConnector/target/
 BOBService/target/
 BOBService/src/main/resources/*.json
+BOBService/.sts4-cache/
 
 
 

@@ -25,6 +25,8 @@ public class AppConstants implements Serializable {
 	public static final String ERROR_CODE_PERMISSION_DENY = "PERMISSION_DENY";
 	public static final String ERROR_CODE_INCORRECT_PWD = "INCORRECT_PWD";
 	public static final String ERROR_CODE_DUPLIATED_USER = "DUPLIATED_USER";
+	public static final String ERROR_CODE_PWDOK = "PASSWORD_OK";
+	
 
 	/** Application Status Setting **/
 	public static final String RETURN_UME_TRUE = "true";

@@ -20,7 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @ComponentScan("com.lp.BOBService.security")
 
 @PropertySources({ @PropertySource("classpath:auth0.properties") })
@@ -32,19 +32,13 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
     @Value(value = "${auth0.issuer}")
     private String issuer;
 
-    /*
-     * public SecurityJavaConfig() { super();
-     * SecurityContextHolder.setStrategyName(SecurityContextHolder.
-     * MODE_INHERITABLETHREADLOCAL); }
-     */
-
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-    
-     //10.254.21.70:8080
-        System.setProperty("https.proxyHost", "10.254.21.70");
-		System.setProperty("https.proxyPort", "8080");
-      //  System.out.println("system proxy" + System.getProperty("https.proxyHost"));
+
+        // 10.254.21.70:8080
+        // System.setProperty("https.proxyHost", "10.254.21.70");
+        /// System.setProperty("https.proxyPort", "8080");
+
         http.cors();
         JwtWebSecurityConfigurer.forRS256(apiAudience, issuer).configure(http).authorizeRequests()
                 .antMatchers("/ume/public/**").permitAll().antMatchers("/ume/api/**").authenticated()
@@ -59,7 +53,7 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedMethods(Arrays.asList("/**"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("Authorization");
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

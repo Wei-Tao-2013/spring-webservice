@@ -1,14 +1,14 @@
 package com.lp.BOBService.selfRegistration.impl;
 
-import com.lp.connector.exception.ConnectorException;
-import com.lp.connector.model.SAPConnectorRequest;
-import com.lp.connector.model.SAPConnectorResponse;
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
 import com.lp.BOBService.selfRegistration.PortalJCO;
 import com.lp.BOBService.selfRegistration.PortalUME;
 import com.lp.BOBService.utils.AppConstants;
 import com.lp.BOBService.utils.PortalServiceUtils;
+import com.lp.connector.exception.ConnectorException;
+import com.lp.connector.model.SAPConnectorRequest;
+import com.lp.connector.model.SAPConnectorResponse;
 import com.sap.security.api.AttributeValueAlreadyExistsException;
 import com.sap.security.api.IGroup;
 import com.sap.security.api.IGroupFactory;
@@ -813,27 +813,29 @@ public class PortalUMEImpl implements PortalUME {
 	}
 
 	/**
-	 * @param logonId
+	 * @param loginId
 	 * @param pwd
 	 * @return
 	 */
-	public Response validateAccount(String logonId, String pwd) {
+	public Response validateAccount(String loginId, String pwd) {
 		String method = "PortalUMEImpl-validateAccount";
-		SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters :" + logonId);
+		SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters :" + loginId);
 		SAPConnectorResponse sapResponse = new SAPConnectorResponse();
 		Response regResponse = null;
 		IUserAccountFactory userAccountFactory = UMFactory.getUserAccountFactory();
 		IUserFactory userFactory = UMFactory.getUserFactory();
 		try {
-			IUserAccount userAccount = userAccountFactory.getUserAccountByLogonId(logonId);
-			IUser user = userFactory.getUserByLogonID(logonId);
+			IUserAccount userAccount = userAccountFactory.getUserAccountByLogonId(loginId);
+			IUser user = userFactory.getUserByLogonID(loginId);
 			int iCheckPwd = userAccount.checkPasswordExtended(pwd);
 			if (iCheckPwd == ILoginConstants.CHECKPWD_OK) {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_TRUE);
 				sapResponse.setFirstName(user.getFirstName());
 				sapResponse.setLastName(user.getLastName());
-				sapResponse.setEmailAddress(logonId);
-				sapResponse.setToken(userAccount.getHashedPassword());
+				sapResponse.setEmailAddress(loginId);
+				sapResponse.setErrCode(AppConstants.ERROR_CODE_PWDOK);
+				//sapResponse.setEmailAddress(user.getEmail());
+				//sapResponse.setToken(userAccount.getHashedPassword());
 			} else {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setErrCode(AppConstants.ERROR_CODE_INCORRECT_PWD);
@@ -844,7 +846,7 @@ public class PortalUMEImpl implements PortalUME {
 				} else {
 					sapResponse.setErrReason(AppConstants.MSG_LOGON_PWD_INCORRECT);
 				}
-				SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters User id :" + logonId
+				SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters User id :" + loginId
 						+ " password failed as " + sapResponse.getErrReason());
 			};
 
@@ -852,14 +854,14 @@ public class PortalUMEImpl implements PortalUME {
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			sapResponse.setErrCode(AppConstants.ERROR_CODE_NoSuchUserAccountException);
 			sapResponse.setErrReason(AppConstants.MSG_NO_USER_EXISTS);
-			SimpleLogger.trace(Severity.INFO, loc, "User " + logonId + " doesn't not exist.");
+			SimpleLogger.trace(Severity.INFO, loc, "User " + loginId + " doesn't not exist.");
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ex);
 		} catch (UMException umex) {
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			sapResponse.setErrCode(AppConstants.ERROR_CODE_UMException);
 			sapResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.validateAccount",
-					"User id : " + logonId);
+					"User id : " + loginId);
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umex);
 		}
 

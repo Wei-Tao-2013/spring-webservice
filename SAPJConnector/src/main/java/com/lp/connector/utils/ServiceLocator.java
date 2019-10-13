@@ -1,13 +1,8 @@
 package com.lp.connector.utils;
 
-import com.lp.connector.impl.SAPConnectorImpl;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoException;
-import com.sap.conn.jco.monitor.JCoDestinationMonitor;
-import com.sap.security.api.UMFactory;
-import com.sap.security.api.umap.IUserMapping;
-import com.sap.security.api.umap.system.ExceptionInImplementationException;
 //import com.sap.security.api.umap.system.ISystemLandscape;
 import com.sap.security.api.umap.system.ISystemLandscapeObject;
 import com.sap.tc.logging.Location;
