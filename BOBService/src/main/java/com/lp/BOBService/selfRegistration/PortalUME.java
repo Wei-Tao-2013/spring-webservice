@@ -6,11 +6,11 @@ import com.lp.BOBService.model.Response;
 import com.sap.security.api.IUserMaint;
 
 public abstract interface PortalUME {
-	public abstract Response initPortalUser(Request paramRegistration)
-			throws ConnectorException;
+	public abstract Response initPortalUser(Request paramRegistration) throws ConnectorException;
 
-	public abstract Response VerifyInitPortalUser(Request paramRegistration)
-			throws ConnectorException;
+	public abstract Response createUMEIdentity(Request paramRegistration) throws ConnectorException;
+
+	public abstract Response VerifyInitPortalUser(Request paramRegistration) throws ConnectorException;
 
 	public abstract Response getEncryptPwd(String logonId) throws ConnectorException;
 
@@ -29,10 +29,9 @@ public abstract interface PortalUME {
 	public abstract void updateUserDepartment(String logonId);
 
 	public abstract IUserMaint getUserInfo(String logonId);
-	
-	public abstract Response resetPassword(Request paramRegistration)
-			throws ConnectorException;
 
-	
+	public abstract boolean checkUserExist(String logonId);
+
+	public abstract Response resetPassword(Request paramRegistration) throws ConnectorException;
 
 }

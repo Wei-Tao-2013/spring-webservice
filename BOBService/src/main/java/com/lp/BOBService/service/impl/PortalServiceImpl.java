@@ -29,10 +29,10 @@ import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
 import com.lp.BOBService.selfRegistration.PortalJCO;
 import com.lp.BOBService.selfRegistration.PortalUME;
-import com.lp.BOBService.service.PortalDetailsResponse;
+import com.lp.BOBService.service.PortalService;
 import com.lp.BOBService.utils.AppConstants;
 import com.lp.BOBService.utils.AppData;
-import com.lp.BOBService.utils.PortalServiceUtils;
+import com.lp.BOBService.utils.ServiceUtils;
 import com.lp.connector.exception.ConnectorException;
 import com.sap.security.api.IUserMaint;
 import com.sap.security.api.UMException;
@@ -60,9 +60,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PortalDetailsResponseImpl implements PortalDetailsResponse {
+public class PortalServiceImpl implements PortalService {
 
-	private static final Location loc = Location.getLocation(PortalDetailsResponseImpl.class);
+	private static final Location loc = Location.getLocation(PortalServiceImpl.class);
 
 	@Autowired
 	private PortalUME portalUMEImpl;
@@ -98,7 +98,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.checkEmail",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -116,7 +116,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		Response RegResponse = new Response();
 		JSONObject jsonObject;
 		try {
-			jsonObject = PortalServiceUtils.performRecaptchaSiteVerify(Request.getGoogleRecaptchaToken());
+			jsonObject = ServiceUtils.performRecaptchaSiteVerify(Request.getGoogleRecaptchaToken());
 
 			SimpleLogger.log(Severity.INFO, Category.SYS_LOGGING, loc, "validateRecaptcha.validateRecaptcha",
 					"your remote addr IP is " + httpRequest.getRemoteAddr());
@@ -148,7 +148,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 	 */
 	public Response sendVerifyEmail() {
 		/*
-		 * if (!PortalServiceUtils.checkIpBlock(httpRequest.getRemoteAddr())){ Response
+		 * if (!ServiceUtils.checkIpBlock(httpRequest.getRemoteAddr())){ Response
 		 * RegResponseBlock = new Response();
 		 * RegResponseBlock.setReturnUME(AppConstants.RETURN_UME_FALSE);
 		 * RegResponseBlock.
@@ -300,12 +300,12 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			// RegResponse.setMandatory("true");
 			RegResponse.setGoogleAPI(AppData.googleAPI);
 			SimpleLogger.trace(Severity.INFO, loc, "Call checkCustomerNumber retrives googleAPI "
-					+ PortalServiceUtils.converToJson(AppData.googleAPI));
+					+ ServiceUtils.converToJson(AppData.googleAPI));
 
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.checkCustomerNumber",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -341,12 +341,12 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			RegResponse.setGoogleAPI(AppData.googleAPI);
 
 			SimpleLogger.trace(Severity.INFO, loc,
-					"Call validateWorkEmail retrives googleAPI " + PortalServiceUtils.converToJson(AppData.googleAPI));
+					"Call validateWorkEmail retrives googleAPI " + ServiceUtils.converToJson(AppData.googleAPI));
 
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.validateWorkEmail",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -396,7 +396,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.registerCustomer",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -418,7 +418,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.registerCustomer",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -442,7 +442,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.verifyAddress",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -464,7 +464,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException ec) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.updatePassword",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -488,7 +488,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 					"PortalDetailsResponseImpl.verifyEmailActivation",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -516,7 +516,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		 * 
 		 * SimpleLogger.trace(Severity.INFO,loc,"initialiseUser request :"+ ip );
 		 * 
-		 * if (!PortalServiceUtils.checkIpBlock(ip)){ Response RegResponseBlock = new
+		 * if (!ServiceUtils.checkIpBlock(ip)){ Response RegResponseBlock = new
 		 * Response(); RegResponseBlock.setReturnUME(AppConstants.RETURN_UME_FALSE);
 		 * RegResponseBlock.
 		 * setErrReason("This Ip is blocked for a while ,please try again, IP is  " +
@@ -551,7 +551,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.initialiseUser",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -574,7 +574,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalDetailsResponseImpl.initialiseUser",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -599,7 +599,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			// TODO Auto-generated catch block
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 					"PortalDetailsResponseImpl.registerEncryptSession",
-					"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 			RegResponse = new Response();
 			RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -651,7 +651,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				// TODO Auto-generated catch block
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 						"PortalDetailsResponseImpl.checkEncryptSession",
-						"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+						"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 				RegResponse = new Response();
 				RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -701,7 +701,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 					} catch (ConnectorException ec) {
 						SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 								"PortalDetailsResponseImpl.checkCompleteRegisterPermission",
-								"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+								"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 						SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
 
 					}
@@ -724,7 +724,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				// TODO Auto-generated catch block
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 						"PortalDetailsResponseImpl.checkCompleteRegisterPermission",
-						"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+						"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 				RegResponse = new Response();
 				RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
@@ -763,7 +763,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				} catch (ConnectorException e) {
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 							"PortalDetailsResponseImpl.checkCompleteRegisterPermission.checkAccountValidation-initial",
-							"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+							"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 					;
 				}
@@ -780,7 +780,7 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 				} catch (ConnectorException e) {
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
 							"PortalDetailsResponseImpl.checkCompleteRegisterPermission.checkAccountValidation-Approval",
-							"Call PortalJcoImpl with request of " + PortalServiceUtils.converToJson(Request));
+							"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
 				}
 				if (AppConstants.RETURN_UME_TRUE.equals(RegResponseValidateAccount.getReturnUME())) { // if pass
@@ -1079,8 +1079,8 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 		Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
 		HttpClient client = HttpClientBuilder.create().build();
 
-		//	HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
-		//	HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
+		// HttpHost target = new HttpHost(AppConstants.SALESFORCE_SITE, 443, "https");
+		// HttpHost proxy = new HttpHost("10.19.21.1", 8080, "http");
 		// RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
 
 		Response regResponse = new Response();
@@ -1091,10 +1091,10 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			SimpleLogger.trace(Severity.INFO, loc, "fetchDriversURL  :" + fetchDriversURL);
 
 			HttpGet httpGet = new HttpGet(fetchDriversURL);
-		
-			//	SimpleLogger.trace(Severity.INFO, loc,
-			//	"Executing request " + httpGet.getRequestLine() + " via proxy " + proxy);
-			//  httpGet.setConfig(config);
+
+			// SimpleLogger.trace(Severity.INFO, loc,
+			// "Executing request " + httpGet.getRequestLine() + " via proxy " + proxy);
+			// httpGet.setConfig(config);
 
 			httpGet.addHeader(prettyPrintHeader);
 
@@ -1211,6 +1211,20 @@ public class PortalDetailsResponseImpl implements PortalDetailsResponse {
 			response.setAuthUser(authUser);
 		}
 		return response;
+	}
+
+	@Override
+	public Response checkPortalAccountUnique(String loginId) {
+		Response response = new Response();
+		Boolean isExist = portalUMEImpl.checkUserExist(loginId);
+		response.setIsPortalUserExist(isExist ? "true" : "false");
+		return response;
+	}
+
+	@Override
+	public Response createUMEIdentity(Request Request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

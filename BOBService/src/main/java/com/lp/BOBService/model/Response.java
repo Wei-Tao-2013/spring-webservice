@@ -40,6 +40,7 @@ public class Response implements java.io.Serializable {
 	private String googleAPI;
 	private String mandatory;
 	private String googleRecaptchaSuccess;
+	private String isPortalUserExist;
 
 	
 

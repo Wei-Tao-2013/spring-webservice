@@ -23,8 +23,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
-public class PortalServiceUtils {
-	private static final Location loc = Location.getLocation(PortalServiceUtils.class);
+public class ServiceUtils {
+	private static final Location loc = Location.getLocation(ServiceUtils.class);
 
 	public static String converToJson(Object obj) {
 		Gson gson = new Gson();

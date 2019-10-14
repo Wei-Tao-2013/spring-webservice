@@ -10,7 +10,7 @@ package com.lp.BOBService.controller;
 
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
-import com.lp.BOBService.service.PortalDetailsResponse;
+import com.lp.BOBService.service.PortalService;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,47 +27,47 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class BOBController {
 
 	@Autowired
-	private PortalDetailsResponse portalDetailsResponse;
+	private PortalService portalService;
 
 	@RequestMapping(value = "/ume/api/resetPassword", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody Response resetPassword(@RequestBody Request Request) throws Throwable {
-		Response regResponse = portalDetailsResponse.resetPassword(Request);
-		return regResponse;
+		Response res = portalService.resetPassword(Request);
+		return res;
 	}
 
 	@RequestMapping(value = "/ume/api/passwordstate/password", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public @ResponseBody Response changePassword(@RequestBody Request Request) throws Throwable {
-		Response regResponse = portalDetailsResponse.resetPassword(Request);
-		return regResponse;
+		Response res = portalService.resetPassword(Request);
+		return res;
 
 	}
 
 	// services/data/v20.0/sobjects/Account/
 	@RequestMapping(value = "/ume/api/callSalesforceNZ", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody Response callSalesforceNZ(@RequestBody Request Request) throws Throwable {
-		Response regResponse = portalDetailsResponse.callSalesforceNZ(Request);
-		return regResponse;
+		Response res = portalService.callSalesforceNZ(Request);
+		return res;
 	}
 
 	// services/data/v20.0/sobjects/Account/
 	@RequestMapping(value = "/ume/api/createSalesforceNZ", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody Response createSalesforceNZ(@RequestBody Request Request) throws Throwable {
-		Response regResponse = portalDetailsResponse.createSalesforceNZ(Request);
-		return regResponse;
+		Response res = portalService.createSalesforceNZ(Request);
+		return res;
 	}
 
 	// access nz data
 	@RequestMapping(value = "/ume/api/drivers", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody Response getDrivers(@RequestBody Request Request) throws Throwable {
-		Response regResponse = portalDetailsResponse.getDrivers(Request);
+		Response res = portalService.getDrivers(Request);
 
-		return regResponse;
+		return res;
 	}
 
 	@RequestMapping(value = "/ume/api/getAccessToken", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody Response getAccessToken(@RequestBody Request Request) throws Throwable {
-		Response regResponse = portalDetailsResponse.getAccessToken(Request.getSalesforceAuthCode());
-		return regResponse;
+		Response res = portalService.getAccessToken(Request.getSalesforceAuthCode());
+		return res;
 	}
 
 	/* test only */
@@ -86,11 +86,28 @@ public class BOBController {
 				.toString();
 	}
 
+	//Portal UME unique check
+	@RequestMapping(value = "/ume/public/authentication/{loginId}", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId
+			) throws Throwable {
+		Response res = portalService.checkPortalAccountUnique(loginId);
+		return res;
+	}
+
+	@RequestMapping(value = "/ume/public/umeIdentity", method = RequestMethod.POST, produces = "application/json")
+
+	public @ResponseBody Response createPortalIdentiy(@RequestBody Request Request) {
+
+		Response res = portalService.createUMEIdentity(Request);
+		return res;
+	}
+
+	//Portal UME authentication 
 	@RequestMapping(value = "/ume/public/authentication/{loginId}/{password}", method = RequestMethod.GET, headers = "Accept=application/json")
 	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId,
 			@PathVariable("password") String password) throws Throwable {
-		Response regResponse = portalDetailsResponse.validateAccount(loginId, password);
-		return regResponse;
+		Response res = portalService.validateAccount(loginId, password);
+		return res;
 	}
 
 	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")

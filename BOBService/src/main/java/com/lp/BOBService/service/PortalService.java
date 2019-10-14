@@ -3,7 +3,7 @@ package com.lp.BOBService.service;
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
 
-public interface PortalDetailsResponse {
+public interface PortalService {
 
 	Response checkEmail(Request Request);
 
@@ -16,6 +16,8 @@ public interface PortalDetailsResponse {
 	Response testJcoconnection(Request Request);
 
 	Response initialiseUser(Request Request);
+
+	Response createUMEIdentity(Request Request);
 
 	Response verifyInitialUser(Request Request);
 
@@ -42,6 +44,8 @@ public interface PortalDetailsResponse {
 	Response checkCompleteRegisterPermission(Request Request);
 
 	Response validateAccount(String loginId,String password);
+
+	Response checkPortalAccountUnique(String loginId);
 
 	String getGoogleGeoTest(String request);
 

@@ -5,7 +5,7 @@ import com.lp.BOBService.model.Response;
 import com.lp.BOBService.selfRegistration.PortalJCO;
 import com.lp.BOBService.selfRegistration.PortalUME;
 import com.lp.BOBService.utils.AppConstants;
-import com.lp.BOBService.utils.PortalServiceUtils;
+import com.lp.BOBService.utils.ServiceUtils;
 import com.lp.connector.exception.ConnectorException;
 import com.lp.connector.model.SAPConnectorRequest;
 import com.lp.connector.model.SAPConnectorResponse;
@@ -53,9 +53,9 @@ public class PortalUMEImpl implements PortalUME {
 	public Response initPortalUser(Request registrationReq) throws ConnectorException {
 		// TODO Auto-generated method stub
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
-		sapReq = (SAPConnectorRequest) PortalServiceUtils.copyProperties(registrationReq, sapReq);
+		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
 		Request requestLog = new Request();
-		requestLog = (Request) PortalServiceUtils.copyProperties(registrationReq, requestLog);
+		requestLog = (Request) ServiceUtils.copyProperties(registrationReq, requestLog);
 		requestLog.setPassword("####");
 		SAPConnectorResponse sapResponse = null;
 		Response regResponse = null;
@@ -63,12 +63,12 @@ public class PortalUMEImpl implements PortalUME {
 		regResponse = portalJCO.callInitAllowEmail(registrationReq);
 		if (!"true".equalsIgnoreCase(regResponse.getReturnCRM())) {
 			SimpleLogger.trace(Severity.INFO, loc, "Call callInitAllowEmail from PortalUMEImpl with response "
-					+ PortalServiceUtils.converToJson(regResponse));
+					+ ServiceUtils.converToJson(regResponse));
 			return regResponse; // call CRM falied
 		}
 
 		SimpleLogger.trace(Severity.INFO, loc, "Call initPortalUser from PortalUMEImpl with Json request "
-				+ PortalServiceUtils.converToJson(requestLog));
+				+ ServiceUtils.converToJson(requestLog));
 		try {
 
 			sapResponse = this.initPortalUser(sapReq);
@@ -82,13 +82,13 @@ public class PortalUMEImpl implements PortalUME {
 			sapResponse.setReturnCRM("X");
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
-					"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(requestLog));
+					"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umrex);
 			regResponse = convertJcoResponse(sapResponse);
 			return regResponse;
 		}
 		SimpleLogger.trace(Severity.INFO, loc, "Response from PortalUMEImpl.initPortalUser  with Json data"
-				+ PortalServiceUtils.converToJson(sapResponse));
+				+ ServiceUtils.converToJson(sapResponse));
 
 		if (AppConstants.RETURN_UME_CREATED.equalsIgnoreCase(sapResponse.getReturnUME())) {
 			if (sapResponse.getCustomerUID() != null) {
@@ -105,7 +105,7 @@ public class PortalUMEImpl implements PortalUME {
 					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 					deleteUser(sapResponse.getCustomerUID());
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
-							"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(requestLog));
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsuex);
 					regResponse = convertJcoResponse(sapResponse);
 					return regResponse;
@@ -118,7 +118,7 @@ public class PortalUMEImpl implements PortalUME {
 					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 					deleteUser(sapResponse.getCustomerUID());
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
-							"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(requestLog));
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsrex);
 					regResponse = convertJcoResponse(sapResponse);
 					return regResponse;
@@ -132,7 +132,7 @@ public class PortalUMEImpl implements PortalUME {
 					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 					deleteUser(sapResponse.getCustomerUID());
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
-							"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(requestLog));
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", avaeex);
 					regResponse = convertJcoResponse(sapResponse);
 					return regResponse;
@@ -144,7 +144,7 @@ public class PortalUMEImpl implements PortalUME {
 					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 					deleteUser(sapResponse.getCustomerUID());
 					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
-							"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(requestLog));
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
 					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umex);
 					regResponse = convertJcoResponse(sapResponse);
 					return regResponse;
@@ -153,12 +153,12 @@ public class PortalUMEImpl implements PortalUME {
 				/*
 				 * System.out.
 				 * println("Call callInitEmailVerification from PortalUMEImpl with Json request "
-				 * + PortalServiceUtils.converToJson(sapReq));
+				 * + ServiceUtils.converToJson(sapReq));
 				 */
 
 				SimpleLogger.trace(Severity.INFO, loc,
 						"Call callInitEmailVerification from PortalUMEImpl with Json request"
-								+ PortalServiceUtils.converToJson(requestLog));
+								+ ServiceUtils.converToJson(requestLog));
 				if (AppConstants.RETURN_UME_CREATED.equalsIgnoreCase(sapResponse.getReturnUME())) {
 					PortalJCO portalJCO = new PortalJCOImpl();
 					try {
@@ -180,7 +180,7 @@ public class PortalUMEImpl implements PortalUME {
 						deleteUser(sapResponse.getCustomerUID());
 						SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
 								"Call callInitEmailVerification with request of "
-										+ PortalServiceUtils.converToJson(requestLog));
+										+ ServiceUtils.converToJson(requestLog));
 						SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ex);
 						regResponse = convertJcoResponse(sapResponse);
 						return regResponse;
@@ -189,11 +189,11 @@ public class PortalUMEImpl implements PortalUME {
 					/*
 					 * System.out.
 					 * println("Response from callInitEmailVerification to PortalUMEImpl with Json data "
-					 * + PortalServiceUtils.converToJson(regResponse));
+					 * + ServiceUtils.converToJson(regResponse));
 					 */
 					SimpleLogger.trace(Severity.INFO, loc,
 							"Response from callInitEmailVerification to PortalUMEImpl.initPortalUser with Json data"
-									+ PortalServiceUtils.converToJson(sapResponse));
+									+ ServiceUtils.converToJson(sapResponse));
 					return regResponse;
 				}
 			} else {
@@ -219,7 +219,7 @@ public class PortalUMEImpl implements PortalUME {
 	public Response VerifyInitPortalUser(Request registrationReq) throws ConnectorException {
 		// TODO Auto-generated method stub
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
-		sapReq = (SAPConnectorRequest) PortalServiceUtils.copyProperties(registrationReq, sapReq);
+		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
 		SAPConnectorResponse sapResponse = null;
 		Response regResponse = null;
 		boolean verifycation = false;
@@ -240,7 +240,7 @@ public class PortalUMEImpl implements PortalUME {
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.VerifyInitPortalUser",
 					"Call callInitEmailVerification with request of "
-							+ PortalServiceUtils.converToJson(registrationReq));
+							+ ServiceUtils.converToJson(registrationReq));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ex);
 			regResponse = convertJcoResponse(sapResponse);
 			return regResponse;
@@ -264,7 +264,7 @@ public class PortalUMEImpl implements PortalUME {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.VerifyInitPortalUser",
-						"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(registrationReq));
+						"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(registrationReq));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsuex);
 				regResponse = convertJcoResponse(sapResponse);
 				return regResponse;
@@ -277,7 +277,7 @@ public class PortalUMEImpl implements PortalUME {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.VerifyInitPortalUser",
-						"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(registrationReq));
+						"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(registrationReq));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsrex);
 				regResponse = convertJcoResponse(sapResponse);
 				return regResponse;
@@ -291,7 +291,7 @@ public class PortalUMEImpl implements PortalUME {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.VerifyInitPortalUser",
-						"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(registrationReq));
+						"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(registrationReq));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", avaeex);
 				regResponse = convertJcoResponse(sapResponse);
 				return regResponse;
@@ -303,7 +303,7 @@ public class PortalUMEImpl implements PortalUME {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
 				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.VerifyInitPortalUser",
-						"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(registrationReq));
+						"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(registrationReq));
 				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umex);
 				regResponse = convertJcoResponse(sapResponse);
 				return regResponse;
@@ -314,7 +314,7 @@ public class PortalUMEImpl implements PortalUME {
 		// /convert sapResponse to RegisterResponse
 		SimpleLogger.trace(Severity.INFO, loc,
 				"Response from callInitEmailVerification to PortalUMEImpl.VerifyInitPortalUser with Json data"
-						+ PortalServiceUtils.converToJson(regResponse));
+						+ ServiceUtils.converToJson(regResponse));
 		return regResponse;
 
 	}
@@ -327,7 +327,7 @@ public class PortalUMEImpl implements PortalUME {
 	 */
 	private Response convertJcoResponse(SAPConnectorResponse sapResponse) {
 		Response regResponse = new Response();
-		regResponse = (Response) PortalServiceUtils.copyProperties(sapResponse, regResponse);
+		regResponse = (Response) ServiceUtils.copyProperties(sapResponse, regResponse);
 		return regResponse;
 	}
 
@@ -834,8 +834,8 @@ public class PortalUMEImpl implements PortalUME {
 				sapResponse.setLastName(user.getLastName());
 				sapResponse.setEmailAddress(loginId);
 				sapResponse.setErrCode(AppConstants.ERROR_CODE_PWDOK);
-				//sapResponse.setEmailAddress(user.getEmail());
-				//sapResponse.setToken(userAccount.getHashedPassword());
+				// sapResponse.setEmailAddress(user.getEmail());
+				// sapResponse.setToken(userAccount.getHashedPassword());
 			} else {
 				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 				sapResponse.setErrCode(AppConstants.ERROR_CODE_INCORRECT_PWD);
@@ -848,7 +848,8 @@ public class PortalUMEImpl implements PortalUME {
 				}
 				SimpleLogger.trace(Severity.INFO, loc, method + " - with request parameters User id :" + loginId
 						+ " password failed as " + sapResponse.getErrReason());
-			};
+			}
+			;
 
 		} catch (NoSuchUserAccountException ex) {
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
@@ -920,19 +921,19 @@ public class PortalUMEImpl implements PortalUME {
 		// TODO Auto-generated method stub
 
 		Request requestLog = new Request();
-		requestLog = (Request) PortalServiceUtils.copyProperties(registrationReq, requestLog);
+		requestLog = (Request) ServiceUtils.copyProperties(registrationReq, requestLog);
 		requestLog.setPassword("####");
 		requestLog.setNewPassword("####");
 
 		Response regResponse = null;
 		SimpleLogger.trace(Severity.INFO, loc, "Call resetPassword from PortalUMEImpl with Json request "
-				+ PortalServiceUtils.converToJson(requestLog));
+				+ ServiceUtils.converToJson(requestLog));
 
 		try {
 			regResponse = this.updatePassword(registrationReq.getLogonId(), registrationReq.getNewPassword());
 		} catch (UMException | UMRuntimeException umrex) {
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.resetPassword",
-					"Call PortalUMEImpl with request of " + PortalServiceUtils.converToJson(requestLog));
+					"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umrex);
 			regResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			regResponse.setAppStatus("RESET FALIED");
@@ -940,7 +941,7 @@ public class PortalUMEImpl implements PortalUME {
 		}
 
 		SimpleLogger.trace(Severity.INFO, loc, "Response from PortalUMEImpl.resetPassword  with Json data"
-				+ PortalServiceUtils.converToJson(regResponse));
+				+ ServiceUtils.converToJson(regResponse));
 		// /convert sapResponse to RegisterResponse
 		return regResponse;
 
@@ -961,6 +962,27 @@ public class PortalUMEImpl implements PortalUME {
 		regResponse.setReturnUME(AppConstants.RETURN_TRUE);
 		regResponse.setAppStatus("RESET PASSWORD");
 		return regResponse;
+	}
+
+	@Override
+	public boolean checkUserExist(String logonId) {
+		IUserFactory userFactory = UMFactory.getUserFactory();
+		IUser user = null;
+		try {
+			user = userFactory.getUserByLogonID(logonId);
+		} catch (NoSuchUserException e) {
+			user = null;
+		} catch (UMException ex) {
+			user = null;
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ex);
+		}
+		return user != null;
+	}
+
+	@Override
+	public Response createUMEIdentity(Request paramRegistration) throws ConnectorException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
