@@ -113,7 +113,7 @@ public class BOBController {
 	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String privateEndpoint() {
-		// System.out.println("system proxy" + System.getProperty("https.proxyHost"));
+		//// System.out.println("system proxy" + System.getProperty("https.proxyHost"));
 		return new JSONObject().put("message", "All good. You can see this because you are Authenticated.").toString();
 	}
 
