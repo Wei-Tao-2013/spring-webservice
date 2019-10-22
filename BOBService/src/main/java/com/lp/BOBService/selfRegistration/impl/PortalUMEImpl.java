@@ -67,8 +67,8 @@ public class PortalUMEImpl implements PortalUME {
 			return regResponse; // call CRM falied
 		}
 
-		SimpleLogger.trace(Severity.INFO, loc, "Call initPortalUser from PortalUMEImpl with Json request "
-				+ ServiceUtils.converToJson(requestLog));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call initPortalUser from PortalUMEImpl with Json request " + ServiceUtils.converToJson(requestLog));
 		try {
 
 			sapResponse = this.initPortalUser(sapReq);
@@ -87,8 +87,8 @@ public class PortalUMEImpl implements PortalUME {
 			regResponse = convertJcoResponse(sapResponse);
 			return regResponse;
 		}
-		SimpleLogger.trace(Severity.INFO, loc, "Response from PortalUMEImpl.initPortalUser  with Json data"
-				+ ServiceUtils.converToJson(sapResponse));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Response from PortalUMEImpl.initPortalUser  with Json data" + ServiceUtils.converToJson(sapResponse));
 
 		if (AppConstants.RETURN_UME_CREATED.equalsIgnoreCase(sapResponse.getReturnUME())) {
 			if (sapResponse.getCustomerUID() != null) {
@@ -239,8 +239,7 @@ public class PortalUMEImpl implements PortalUME {
 			sapResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
 			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.VerifyInitPortalUser",
-					"Call callInitEmailVerification with request of "
-							+ ServiceUtils.converToJson(registrationReq));
+					"Call callInitEmailVerification with request of " + ServiceUtils.converToJson(registrationReq));
 			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ex);
 			regResponse = convertJcoResponse(sapResponse);
 			return regResponse;
@@ -926,8 +925,8 @@ public class PortalUMEImpl implements PortalUME {
 		requestLog.setNewPassword("####");
 
 		Response regResponse = null;
-		SimpleLogger.trace(Severity.INFO, loc, "Call resetPassword from PortalUMEImpl with Json request "
-				+ ServiceUtils.converToJson(requestLog));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call resetPassword from PortalUMEImpl with Json request " + ServiceUtils.converToJson(requestLog));
 
 		try {
 			regResponse = this.updatePassword(registrationReq.getLogonId(), registrationReq.getNewPassword());
@@ -940,8 +939,8 @@ public class PortalUMEImpl implements PortalUME {
 			// return regResponse;
 		}
 
-		SimpleLogger.trace(Severity.INFO, loc, "Response from PortalUMEImpl.resetPassword  with Json data"
-				+ ServiceUtils.converToJson(regResponse));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Response from PortalUMEImpl.resetPassword  with Json data" + ServiceUtils.converToJson(regResponse));
 		// /convert sapResponse to RegisterResponse
 		return regResponse;
 
@@ -980,9 +979,111 @@ public class PortalUMEImpl implements PortalUME {
 	}
 
 	@Override
-	public Response createUMEIdentity(Request paramRegistration) throws ConnectorException {
-		// TODO Auto-generated method stub
-		return null;
+	public Response createUMEIdentity(Request registrationReq) throws ConnectorException {
+
+		SAPConnectorRequest sapReq = new SAPConnectorRequest();
+		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
+		Request requestLog = new Request();
+		requestLog = (Request) ServiceUtils.copyProperties(registrationReq, requestLog);
+		requestLog.setPassword("####");
+		SAPConnectorResponse sapResponse = null;
+		Response regResponse = null;
+
+		// check if this user account is allowed by CRM
+		regResponse = portalJCO.callInitAllowEmail(registrationReq);
+		if (!"true".equalsIgnoreCase(regResponse.getReturnCRM())) {
+			SimpleLogger.trace(Severity.INFO, loc, "Call callInitAllowEmail from PortalUMEImpl with response "
+					+ ServiceUtils.converToJson(regResponse));
+			return regResponse; // call CRM falied
+		}
+
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call createUMEIdentity from PortalUMEImpl with Json request " + ServiceUtils.converToJson(requestLog));
+		try {
+
+			sapResponse = this.initPortalUser(sapReq);
+			sapResponse.setReturnCRM("X");
+
+		} catch (UMException | UMRuntimeException umrex) {
+			sapResponse = new SAPConnectorResponse();
+			sapResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+			sapResponse.setErrCode(AppConstants.ERROR_CODE_UMException);
+			sapResponse.setReturnCRM("X");
+			sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.initialiseUser",
+					"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umrex);
+			regResponse = convertJcoResponse(sapResponse);
+			return regResponse;
+		}
+		SimpleLogger.trace(Severity.INFO, loc, "Response from PortalUMEImpl.createUMEIdentity  with Json data"
+				+ ServiceUtils.converToJson(sapResponse));
+
+		if (AppConstants.RETURN_UME_CREATED.equalsIgnoreCase(sapResponse.getReturnUME())) {
+			if (sapResponse.getCustomerUID() != null) {
+				try {
+					/*
+					 * assignPortalRole(sapResponse.getCustomerUID(), AppConstants.SELF_INIT_ROLE);
+					 */
+					this.assignPortalGroupRole(sapResponse.getCustomerUID(), AppConstants.SELF_INIT_GROUP, false);
+				} catch (NoSuchUserException | NoSuchUserAccountException nsuex) {
+					// TODO: Handle NoSuchUserException.
+					// sapResponse = new SAPConnectorResponse(); //// Error type 2 Call LP ...
+					sapResponse.setErrReason(AppConstants.MSG_NO_USER_EXISTS);
+					sapResponse.setErrCode(AppConstants.ERROR_CODE_NoSuchUserException);
+					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+					deleteUser(sapResponse.getCustomerUID());
+					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.createUMEIdentity",
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
+					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsuex);
+					regResponse = convertJcoResponse(sapResponse);
+					return regResponse;
+
+				} catch (NoSuchGroupException nsrex) {
+					sapResponse.setErrReason(AppConstants.MSG_NO_GROUP_FOUND);
+					sapResponse.setErrCode(AppConstants.ERROR_CODE_NoSuchRoleException);
+					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+					deleteUser(sapResponse.getCustomerUID());
+					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.createUMEIdentity",
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
+					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsrex);
+					regResponse = convertJcoResponse(sapResponse);
+					return regResponse;
+
+				} catch (AttributeValueAlreadyExistsException avaeex) {
+					sapResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+					sapResponse.setErrCode(AppConstants.ERROR_CODE_AttributeValueAlreadyExistsException);
+					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+					deleteUser(sapResponse.getCustomerUID());
+					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.createUMEIdentity",
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
+					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", avaeex);
+					regResponse = convertJcoResponse(sapResponse);
+					return regResponse;
+				} catch (UMException | UMRuntimeException umex) {
+					sapResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+					sapResponse.setErrCode(AppConstants.ERROR_CODE_UMException);
+					sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+					deleteUser(sapResponse.getCustomerUID());
+					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalUMEImpl.createUMEIdentity",
+							"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(requestLog));
+					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umex);
+					regResponse = convertJcoResponse(sapResponse);
+					return regResponse;
+				}
+
+				SimpleLogger.trace(Severity.INFO, loc, "Call createUMEIdentity from PortalUMEImpl with Json request"
+						+ ServiceUtils.converToJson(requestLog));
+
+			} else {
+				sapResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+				sapResponse.setErrCode(AppConstants.ERROR_CODE_LoginIDNotFound);
+				sapResponse.setErrReason(AppConstants.MSG_NO_LOGON_ID);
+			}
+		}
+		// /convert sapResponse to RegisterResponse
+		regResponse = convertJcoResponse(sapResponse);
+		return regResponse;
 	}
 
 }

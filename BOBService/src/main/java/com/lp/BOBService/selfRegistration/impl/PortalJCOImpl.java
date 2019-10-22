@@ -14,7 +14,6 @@ import com.lp.BOBService.utils.ServiceUtils;
 import com.sap.tc.logging.Location;
 import com.sap.tc.logging.Severity;
 import com.sap.tc.logging.SimpleLogger;
-
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -57,11 +56,6 @@ public class PortalJCOImpl implements PortalJCO {
 		SAPConnector sapConnector = new SAPConnectorImpl();
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
-		/*
-		 * System.out.
-		 * println("Call callCustomerValidation from PortalJCOImpl with Json request " +
-		 * ServiceUtils.converToJson(sapReq));
-		 */
 		SimpleLogger.trace(Severity.INFO, loc, "Call callMandatoryIndicator from PortalJCOImpl with Json request"
 				+ ServiceUtils.converToJson(sapReq));
 		SAPConnectorResponse sapResponse = sapConnector.callMandatoryIndicator(sapReq);

@@ -299,8 +299,8 @@ public class PortalServiceImpl implements PortalService {
 			RegResponse.setMandatory(RegResponseMandatory.getMandatory());
 			// RegResponse.setMandatory("true");
 			RegResponse.setGoogleAPI(AppData.googleAPI);
-			SimpleLogger.trace(Severity.INFO, loc, "Call checkCustomerNumber retrives googleAPI "
-					+ ServiceUtils.converToJson(AppData.googleAPI));
+			SimpleLogger.trace(Severity.INFO, loc,
+					"Call checkCustomerNumber retrives googleAPI " + ServiceUtils.converToJson(AppData.googleAPI));
 
 		} catch (ConnectorException e) {
 			// TODO Auto-generated catch block
@@ -1222,9 +1222,18 @@ public class PortalServiceImpl implements PortalService {
 	}
 
 	@Override
-	public Response createUMEIdentity(Request Request) {
+	public Response createUMEIdentity(Request request) {
 		// TODO Auto-generated method stub
-		return null;
-	}
+		Response response = new Response();
+		try {
+			response = portalUMEImpl.createUMEIdentity(request);
+		} catch (ConnectorException e) {
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
+			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setAppStatus(AppConstants.RETURN_FALSE);
+		}
+		return response;
 
+	}
 }
