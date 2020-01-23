@@ -188,6 +188,12 @@
 			<artifactId>auth0-spring-security-api</artifactId>
 			<version>1.2.5</version>
 		</dependency>
+
+		<dependency>
+    <groupId>com.auth0</groupId>
+    <artifactId>jwks-rsa</artifactId>
+    <version>0.9.0</version>
+</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
 		<dependency>
@@ -258,7 +264,7 @@
 				<version>3.2.2</version>
 				<configuration>
 					<!--<outputDirectory>C:\apache-tomcat-8.0.47\webapps</outputDirectory>-->
-					<outputDirectory>H:\deployment</outputDirectory>
+					<outputDirectory>C:\deployment</outputDirectory>
 					<warName>BOBService</warName>
 				</configuration>
 			</plugin>
