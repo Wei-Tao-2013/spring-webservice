@@ -14,6 +14,7 @@ import com.lp.BOBService.service.PortalService;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @CrossOrigin
 public class BOBController {
 
+	@Value(value = "${encrypted.auth0.clientId}")
+    private String clientId;
+    @Value(value = "${encrypted.auth0.clientSecret}")
+	private String clientSecret;
+	
 	@Autowired
 	private PortalService portalService;
 
@@ -73,7 +79,7 @@ public class BOBController {
 	/* test only */
 	@RequestMapping(value = "/ume/{callName}", method = RequestMethod.GET, headers = "Accept=text/plain")
 	public @ResponseBody String getSayHello(@PathVariable("callName") String callName) throws Throwable {
-		return "Welcome BOBServices I am " + callName + ", How are we ?";
+		return "Client id :: "+ clientId + " Secret ::" + clientSecret;
 	}
 
 	@RequestMapping(value = "/ume/public/test", method = RequestMethod.GET, produces = "application/json")
@@ -113,6 +119,7 @@ public class BOBController {
 	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String privateEndpoint() {
+		
 		//// System.out.println("system proxy" + System.getProperty("https.proxyHost"));
 		return new JSONObject().put("message", "All good. You can see this because you are Authenticated.").toString();
 	}
