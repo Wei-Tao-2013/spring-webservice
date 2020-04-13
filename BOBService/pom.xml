@@ -268,7 +268,7 @@
 				<version>3.2.2</version>
 				<configuration>
 					<!--<outputDirectory>C:\apache-tomcat-8.0.47\webapps</outputDirectory>-->
-					<outputDirectory>C:\deployment</outputDirectory>
+					<outputDirectory>H:\deployment</outputDirectory>
 					<warName>BOBService</warName>
 				</configuration>
 			</plugin>

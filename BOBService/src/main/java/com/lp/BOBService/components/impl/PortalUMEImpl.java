@@ -1,9 +1,9 @@
-package com.lp.BOBService.selfRegistration.impl;
+package com.lp.BOBService.components.impl;
 
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
-import com.lp.BOBService.selfRegistration.PortalJCO;
-import com.lp.BOBService.selfRegistration.PortalUME;
+import com.lp.BOBService.components.PortalJCO;
+import com.lp.BOBService.components.PortalUME;
 import com.lp.BOBService.utils.AppConstants;
 import com.lp.BOBService.utils.ServiceUtils;
 import com.lp.connector.exception.ConnectorException;
@@ -213,7 +213,7 @@ public class PortalUMEImpl implements PortalUME {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalUME#VerifyInitPortalUser(com.lp.
+	 * com.lp.BOBService.components.PortalUME#VerifyInitPortalUser(com.lp.
 	 * BOBService.model.Request)
 	 */
 	public Response VerifyInitPortalUser(Request registrationReq) throws ConnectorException {
@@ -394,7 +394,7 @@ public class PortalUMEImpl implements PortalUME {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.lp.BOBService.selfRegistration.PortalUME#updateUserDepartment(java.
+	 * @see com.lp.BOBService.components.PortalUME#updateUserDepartment(java.
 	 * lang.String)
 	 */
 	public void updateUserDepartment(String logonId) {
@@ -428,7 +428,7 @@ public class PortalUMEImpl implements PortalUME {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalUME#getUserInfo(java.lang.String)
+	 * com.lp.BOBService.components.PortalUME#getUserInfo(java.lang.String)
 	 */
 	public IUserMaint getUserInfo(String logonId) {
 		String method = "PortalUMEImpl-getUserInfo";
@@ -536,7 +536,7 @@ public class PortalUMEImpl implements PortalUME {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.lp.BOBService.selfRegistration.PortalUME#checkDriverGroup(java.lang.
+	 * @see com.lp.BOBService.components.PortalUME#checkDriverGroup(java.lang.
 	 * String)
 	 */
 	public boolean checkDriverGroup(String logonId) {
@@ -666,7 +666,7 @@ public class PortalUMEImpl implements PortalUME {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalUME#assignApprovalGroup(java.lang
+	 * com.lp.BOBService.components.PortalUME#assignApprovalGroup(java.lang
 	 * .String)
 	 */
 	public Response assignApprovalGroup(String LoginId) {
@@ -872,7 +872,7 @@ public class PortalUMEImpl implements PortalUME {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.lp.BOBService.selfRegistration.PortalUME#getEncryptPwd(java.lang.
+	 * @see com.lp.BOBService.components.PortalUME#getEncryptPwd(java.lang.
 	 * String)
 	 */
 	public Response getEncryptPwd(String logonId) throws ConnectorException {

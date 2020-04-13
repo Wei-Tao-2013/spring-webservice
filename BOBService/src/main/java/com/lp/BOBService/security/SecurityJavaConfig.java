@@ -16,16 +16,13 @@ import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @ComponentScan("com.lp.BOBService.security")
-
 @PropertySources({ @PropertySource("classpath:auth0.properties") })
 
 public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
@@ -34,24 +31,21 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
     private String apiAudience;
     @Value(value = "${auth0.issuer}")
     private String issuer;
-   
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
 
         // https://test-auth-ap.leaseplan.com/.well-known/jwks.json
-
-        JwkProvider provider = new JwkProviderBuilder(issuer)
-            .cached(10, 24, TimeUnit.HOURS)
-            .rateLimited(10, 1, TimeUnit.MINUTES) 
-            .build();
+        JwkProvider provider = new JwkProviderBuilder(issuer).cached(10, 24, TimeUnit.HOURS)
+                .rateLimited(10, 1, TimeUnit.MINUTES).build();
 
         http.cors();
-        //System.out.println("JWK is --->"+ provider.get("NTUwQkJGMEM0MDA5Qzc2QTkzMURBNzFDM0YyMzU4QkMxNDhGN0ZCQw"));
-       
-        JwtWebSecurityConfigurer.forRS256(apiAudience, issuer, new JwtAuthenticationProvider(provider, issuer, apiAudience)).configure(http).authorizeRequests()
-                .antMatchers("/ume/public/**").permitAll().antMatchers("/ume/api/**").authenticated()
-                .antMatchers("/ume/api-scoped/**").hasAuthority("update:ume");
+
+        JwtWebSecurityConfigurer
+                .forRS256(apiAudience, issuer, new JwtAuthenticationProvider(provider, issuer, apiAudience))
+                .configure(http).authorizeRequests().antMatchers("/ume/public/**").permitAll()
+                .antMatchers("/ume/api/**").authenticated().antMatchers("/ume/api-scoped/**")
+                .hasAuthority("update:ume");
 
     }
 
@@ -62,7 +56,6 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedMethods(Arrays.asList("/**"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("Authorization");
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

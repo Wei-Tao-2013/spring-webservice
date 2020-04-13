@@ -1,4 +1,4 @@
-package com.lp.BOBService.selfRegistration.impl;
+package com.lp.BOBService.components.impl;
 
 import com.lp.connector.SAPConnector;
 import com.lp.connector.exception.ConnectorException;
@@ -9,7 +9,7 @@ import com.lp.connector.model.SAPConnectorResponse;
 import com.lp.BOBService.model.CustomerData;
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
-import com.lp.BOBService.selfRegistration.PortalJCO;
+import com.lp.BOBService.components.PortalJCO;
 import com.lp.BOBService.utils.ServiceUtils;
 import com.sap.tc.logging.Location;
 import com.sap.tc.logging.Severity;
@@ -26,7 +26,7 @@ public class PortalJCOImpl implements PortalJCO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.lp.BOBService.selfRegistration.PortalJCO#testJcoCall(com.lp.
+	 * @see com.lp.BOBService.components.PortalJCO#testJcoCall(com.lp.
 	 * BOBService.model.Request)
 	 */
 	@Override
@@ -44,11 +44,11 @@ public class PortalJCOImpl implements PortalJCO {
 		RegResponse.setCustomerTxt(sapResponse.getCustomerTxt());
 		return RegResponse;
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalJCO#callMandatoryIndicator(com.lp
+	 * @see com.lp.BOBService.components.PortalJCO#callMandatoryIndicator(com.lp
 	 * .BOBService.model.Request)
 	 */
 	@Override
@@ -56,8 +56,8 @@ public class PortalJCOImpl implements PortalJCO {
 		SAPConnector sapConnector = new SAPConnectorImpl();
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
-		SimpleLogger.trace(Severity.INFO, loc, "Call callMandatoryIndicator from PortalJCOImpl with Json request"
-				+ ServiceUtils.converToJson(sapReq));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call callMandatoryIndicator from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
 		SAPConnectorResponse sapResponse = sapConnector.callMandatoryIndicator(sapReq);
 		// /convert sapResponse to RegisterResponse
 		SimpleLogger.trace(Severity.INFO, loc, "Response from callMandatoryIndicator to PortalJCOImpl with Json data"
@@ -69,20 +69,17 @@ public class PortalJCOImpl implements PortalJCO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalJCO#callCustomerRegistration(com.
+	 * @see com.lp.BOBService.components.PortalJCO#callCustomerRegistration(com.
 	 * lp.BOBService.model.Request)
 	 */
 	@Override
-	public Response callCustomerRegistration(Request registrationReq)
-			throws ConnectorException {
+	public Response callCustomerRegistration(Request registrationReq) throws ConnectorException {
 		// TODO Auto-generated method stub
 		SAPConnector sapConnector = new SAPConnectorImpl();
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
 		com.lp.connector.model.Address addr = new Address();
-		addr = (com.lp.connector.model.Address) ServiceUtils.copyProperties(registrationReq.getResiAddress(),
-				addr);
+		addr = (com.lp.connector.model.Address) ServiceUtils.copyProperties(registrationReq.getResiAddress(), addr);
 		sapReq.setResiAddress(addr);
 		SimpleLogger.trace(Severity.INFO, loc, "Call callCustomerRegistration from PortalJCOImpl with Json request"
 				+ ServiceUtils.converToJson(sapReq));
@@ -98,8 +95,7 @@ public class PortalJCOImpl implements PortalJCO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalJCO#callWorkEamilValiation(com.lp
+	 * @see com.lp.BOBService.components.PortalJCO#callWorkEamilValiation(com.lp
 	 * .BOBService.model.Request)
 	 */
 	@Override
@@ -113,8 +109,8 @@ public class PortalJCOImpl implements PortalJCO {
 			registrationReq.setVerIndicator("");
 		}
 		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
-		SimpleLogger.trace(Severity.INFO, loc, "Call callWorkEamilValiation from PortalJCOImpl with Json request"
-				+ ServiceUtils.converToJson(sapReq));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call callWorkEamilValiation from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
 		SAPConnectorResponse sapResponse = sapConnector.callWorkEamilValiation(sapReq);
 		// /convert sapResponse to RegisterResponse
 		SimpleLogger.trace(Severity.INFO, loc, "Response from callWorkEamilValiation to PortalJCOImpl with Json data"
@@ -129,13 +125,11 @@ public class PortalJCOImpl implements PortalJCO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.lp.BOBService.selfRegistration.PortalJCO#callInitEmailVerification(com
+	 * @see com.lp.BOBService.components.PortalJCO#callInitEmailVerification(com
 	 * .lp.BOBService.model.Request)
 	 */
 	@Override
-	public Response callInitEmailVerification(Request registrationReq)
-			throws ConnectorException {
+	public Response callInitEmailVerification(Request registrationReq) throws ConnectorException {
 
 		// TODO Auto-generated method stub
 		SAPConnector sapConnector = new SAPConnectorImpl();
@@ -155,7 +149,7 @@ public class PortalJCOImpl implements PortalJCO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.lp.BOBService.selfRegistration.PortalJCO#callVerifyToken(com.lp.
+	 * @see com.lp.BOBService.components.PortalJCO#callVerifyToken(com.lp.
 	 * BOBService.model.Request)
 	 */
 	@Override
@@ -164,10 +158,10 @@ public class PortalJCOImpl implements PortalJCO {
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		SAPConnector sapConnector = new SAPConnectorImpl();
 		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
-		SimpleLogger.trace(Severity.INFO, loc, "Call callVerifyToken from PortalJCOImpl with Json request"
-				+ ServiceUtils.converToJson(sapReq));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call callVerifyToken from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
 		SAPConnectorResponse sapResponse = sapConnector.callVerifyToken(sapReq);
-		
+
 		// /convert sapResponse to RegisterResponse
 		SimpleLogger.trace(Severity.INFO, loc, "Response from callVerifyToken to PortalJCOImpl with Json data"
 				+ ServiceUtils.converToJson(sapResponse));
@@ -190,8 +184,7 @@ public class PortalJCOImpl implements PortalJCO {
 		SimpleLogger.trace(Severity.INFO, loc,
 				"Call callAddressCheck from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
 		com.lp.connector.model.Address addr = new Address();
-		addr = (com.lp.connector.model.Address) ServiceUtils.copyProperties(registrationReq.getResiAddress(),
-				addr);
+		addr = (com.lp.connector.model.Address) ServiceUtils.copyProperties(registrationReq.getResiAddress(), addr);
 		sapReq.setResiAddress(addr);
 		SAPConnectorResponse sapResponse = sapConnector.callAddressCheck(sapReq);
 		// /convert sapResponse to RegisterResponse
@@ -203,8 +196,7 @@ public class PortalJCOImpl implements PortalJCO {
 	}
 
 	@Override
-	public Response callVerifyEmailActivation(Request registrationReq)
-			throws ConnectorException {
+	public Response callVerifyEmailActivation(Request registrationReq) throws ConnectorException {
 
 		// TODO Auto-generated method stub
 		SAPConnector sapConnector = new SAPConnectorImpl();
@@ -269,8 +261,8 @@ public class PortalJCOImpl implements PortalJCO {
 		SAPConnector sapConnector = new SAPConnectorImpl();
 		SAPConnectorRequest sapReq = new SAPConnectorRequest();
 		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(registrationReq, sapReq);
-		SimpleLogger.trace(Severity.INFO, loc, "Call callInitAllowEmail from PortalJCOImpl with Json request"
-				+ ServiceUtils.converToJson(sapReq));
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call callInitAllowEmail from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
 		SAPConnectorResponse sapResponse = sapConnector.callInitAllowEmail(sapReq);
 		// /convert sapResponse to RegisterResponse
 		SimpleLogger.trace(Severity.INFO, loc, "Response from callInitAllowEmail to PortalJCOImpl with Json data"
@@ -280,9 +272,24 @@ public class PortalJCOImpl implements PortalJCO {
 	}
 
 	@Override
-	public Response callCustomerValidation(Request paramRegistration)
-			throws ConnectorException {
+	public Response callCustomerValidation(Request paramRegistration) throws ConnectorException {
 		return null;
+	}
+
+	@Override
+	public Response callGetBPInfo(Request request) throws ConnectorException {
+
+		// TODO Auto-generated method stub
+		SAPConnector sapConnector = new SAPConnectorImpl();
+		SAPConnectorRequest sapReq = new SAPConnectorRequest();
+		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(request, sapReq);
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call callGetBPInfo from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
+		SAPConnectorResponse sapResponse = sapConnector.callGetBPInfo(sapReq);
+		SimpleLogger.trace(Severity.INFO, loc, "Response from callgetBP info to PortalJCOImpl with Json data"
+				+ ServiceUtils.converToJson(sapResponse));
+		Response response = convertJcoResponse(sapResponse);
+		return response;
 	}
 
 }

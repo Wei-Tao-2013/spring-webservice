@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class BOBController {
 
 	@Value(value = "${encrypted.auth0.clientId}")
-    private String clientId;
-    @Value(value = "${encrypted.auth0.clientSecret}")
+	private String clientId;
+	@Value(value = "${encrypted.auth0.clientSecret}")
 	private String clientSecret;
-	
+
 	@Autowired
 	private PortalService portalService;
 
@@ -79,7 +79,19 @@ public class BOBController {
 	/* test only */
 	@RequestMapping(value = "/ume/{callName}", method = RequestMethod.GET, headers = "Accept=text/plain")
 	public @ResponseBody String getSayHello(@PathVariable("callName") String callName) throws Throwable {
-		return "Client id :: "+ clientId + " Secret ::" + clientSecret;
+		return "Client id :::" + clientId + " Secret :::" + clientSecret;
+	}
+
+	// get user's group on portal
+	@RequestMapping(value = "/ume/api/users/{userId}/groups", method = RequestMethod.GET, headers = "Accept=text/plain")
+	public @ResponseBody String getUserSGroup(@PathVariable("userId") String userId) throws Throwable {
+		return portalService.getUserGroup(userId);
+	}
+
+	// update user's group on protal
+	@RequestMapping(value = "/ume/api/users/verifiedGroups", method = RequestMethod.PATCH, headers = "Accept=application/json")
+	public @ResponseBody Response updateUserGroup(@RequestBody Request Request) throws Throwable {
+		return portalService.updateUser2VerifiedGroups(Request);
 	}
 
 	@RequestMapping(value = "/ume/public/test", method = RequestMethod.GET, produces = "application/json")
@@ -87,39 +99,57 @@ public class BOBController {
 	public String publicEndpoint() {
 		return new JSONObject()
 				.put("message",
-						"All good! You DO NOT need to be authenticated to call /api/public via proxy and port --> "
+						"All good!!!!!! You DO NOT need to be authenticated to call /api/public via proxy and port --> "
 								+ System.getProperty("https.proxyHost") + ":" + System.getProperty("https.proxyPort"))
 				.toString();
 	}
 
-	//Portal UME unique check
+	// Portal UME unique check
 	@RequestMapping(value = "/ume/public/authentication/{loginId}", method = RequestMethod.GET, headers = "Accept=application/json")
-	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId
-			) throws Throwable {
+	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId) throws Throwable {
 		Response res = portalService.checkPortalAccountUnique(loginId);
 		return res;
 	}
 
-	@RequestMapping(value = "/ume/public/umeIdentity", method = RequestMethod.POST, produces = "application/json")
-
+	@RequestMapping(value = "/ume/api/umeIdentity", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody Response createPortalIdentiy(@RequestBody Request Request) {
-
 		Response res = portalService.createUMEIdentity(Request);
 		return res;
 	}
 
-	//Portal UME authentication 
-	@RequestMapping(value = "/ume/public/authentication/{loginId}/{password}", method = RequestMethod.GET, headers = "Accept=application/json")
+	// Portal UME authentication
+	@RequestMapping(value = "/ume/api/authentication/{loginId}/{password}", method = RequestMethod.GET, headers = "Accept=application/json")
 	public @ResponseBody Response authenticationEndpoint(@PathVariable("loginId") String loginId,
 			@PathVariable("password") String password) throws Throwable {
 		Response res = portalService.validateAccount(loginId, password);
 		return res;
 	}
 
+	// Get BP Information
+	@RequestMapping(value = "/ume/api/BP/{loginId}", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody Response getBPEndpoint(@PathVariable("loginId") String loginId) throws Throwable {
+		Response res = portalService.getBPinfo(loginId);
+		return res;
+	}
+
+	// check if login user has permission to go complete register as per user's
+	// existing role assigned on portal
+	@RequestMapping(value = "/ume/api/registerSession", method = RequestMethod.POST, headers = "Accept=application/json")
+	public @ResponseBody Response registerSession(@RequestBody Request request) {
+		Response res = portalService.registerEncryptSession(request);
+		return res;
+	}
+
+	@RequestMapping(value = "/ume/api/verifyInitialUser", method = RequestMethod.POST, headers = "Accept=application/json")
+	public @ResponseBody Response verifyInitialUser(@RequestBody Request request) {
+		Response res = portalService.verifyInitialUser(request);
+		return res;
+	}
+
 	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String privateEndpoint() {
-		
+
 		//// System.out.println("system proxy" + System.getProperty("https.proxyHost"));
 		return new JSONObject().put("message", "All good. You can see this because you are Authenticated.").toString();
 	}

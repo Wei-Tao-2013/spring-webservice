@@ -27,14 +27,20 @@ import com.google.maps.model.GeocodingResult;
 import com.lp.BOBService.model.AuthUser;
 import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
-import com.lp.BOBService.selfRegistration.PortalJCO;
-import com.lp.BOBService.selfRegistration.PortalUME;
+import com.lp.BOBService.components.PortalJCO;
+import com.lp.BOBService.components.PortalUME;
 import com.lp.BOBService.service.PortalService;
 import com.lp.BOBService.utils.AppConstants;
 import com.lp.BOBService.utils.AppData;
 import com.lp.BOBService.utils.ServiceUtils;
 import com.lp.connector.exception.ConnectorException;
+import com.sap.security.api.AttributeValueAlreadyExistsException;
+import com.sap.security.api.IGroupFactory;
+import com.sap.security.api.IUser;
+import com.sap.security.api.IGroup;
+import com.sap.security.api.IUserFactory;
 import com.sap.security.api.IUserMaint;
+import com.sap.security.api.NoSuchUserException;
 import com.sap.security.api.UMException;
 import com.sap.tc.logging.Category;
 import com.sap.tc.logging.Location;
@@ -58,6 +64,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.sap.security.api.NoSuchGroupException;
+import com.sap.security.api.NoSuchRoleException;
+import com.sap.security.api.NoSuchUserAccountException;
+import com.sap.security.api.NoSuchUserException;
+import com.sap.security.api.UMException;
+import com.sap.security.api.UMFactory;
+import com.sap.security.api.UMRuntimeException;
+import com.sap.security.api.UserAccountAlreadyExistsException;
+import com.sap.security.api.UserAlreadyExistsException;
 
 @Component
 public class PortalServiceImpl implements PortalService {
@@ -800,6 +815,126 @@ public class PortalServiceImpl implements PortalService {
 		return RegResponse;
 	}
 
+
+	public Response setCompleteRegisterPermission(Request Request) {
+		Response RegResponse = new Response();
+		String logonId = Request.getEmailAddress();
+		String groupType = portalUMEImpl.checkGroup(logonId);
+		SimpleLogger.trace(Severity.INFO, loc, "setCompleteRegisterPermission groupType is  :" + groupType);
+		if (groupType.equalsIgnoreCase(AppConstants.SELF_COMPLETED_GROUP_TYPE)
+				|| groupType.equalsIgnoreCase(AppConstants.SELF_PENDING_GROUP_TYPE)) {
+			// additional check for pending group
+			if (groupType.equalsIgnoreCase(AppConstants.SELF_PENDING_GROUP_TYPE)) {
+				if (portalUMEImpl.checkDriverGroup(logonId)) {
+					Response RegResponseUME;
+					try {
+						RegResponseUME = portalUMEImpl.assignApprovalGroup(logonId);
+						if (AppConstants.RETURN_UME_TRUE.equalsIgnoreCase(RegResponseUME.getReturnUME())) {
+							portalUMEImpl.removeGroup(logonId, AppConstants.SELF_PENDING_GROUP);
+							groupType = AppConstants.SELF_APPROVAL_GROUP_TYPE;
+						}
+					} catch (ConnectorException ec) {
+						SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
+								"PortalDetailsResponseImpl.checkCompleteRegisterPermission",
+								"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
+						SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
+
+					}
+				}
+			}
+			// end additional check
+		}
+		// login validation
+
+		if (groupType.equalsIgnoreCase(AppConstants.SELF_COMPLETED_GROUP_TYPE)
+				|| groupType.equalsIgnoreCase(AppConstants.SELF_PENDING_GROUP_TYPE)) {
+			try {
+				RegResponse = portalUMEImpl.validateAccount(Request.getEmailAddress(), Request.getPassword());
+				if (AppConstants.RETURN_UME_TRUE.equals(RegResponse.getReturnUME())) { // if pass validation ,set
+																						// encryptSession with token
+					httpSession.setAttribute("encryptSession", RegResponse.getToken());
+				}
+
+			} catch (ConnectorException e) {
+				// TODO Auto-generated catch block
+				SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
+						"PortalDetailsResponseImpl.checkCompleteRegisterPermission",
+						"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
+				SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
+				RegResponse = new Response();
+				RegResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+				RegResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+				return RegResponse;
+			}
+
+		} else {
+			RegResponse.setErrCode(AppConstants.ERROR_CODE_PERMISSION_DENY);
+			RegResponse.setErrReason(AppConstants.MSG_DENY);
+			RegResponse.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			RegResponse.setGroupType(groupType);
+			// as initial group will set up cookie for providing possibility recording email
+			// sending information
+			if (groupType.equalsIgnoreCase(AppConstants.SELF_INIT_GROUP_TYPE)) {
+				// set logon id cookie
+				Cookie logonIdCookie = new Cookie("selfRegLogonId", logonId);
+				// setting max age to be 30 mins
+				logonIdCookie.setMaxAge(30 * 60);
+				logonIdCookie.setPath("/");
+				httpResponse.addCookie(logonIdCookie);
+
+				// set session for security
+				Response RegResponseValidateAccount = new Response();
+				try {
+					RegResponseValidateAccount = portalUMEImpl.validateAccount(logonId, Request.getPassword());
+					if (AppConstants.RETURN_UME_TRUE.equals(RegResponseValidateAccount.getReturnUME())) { // if pass
+																											// validation
+																											// ,set
+																											// encryptSession
+																											// with
+																											// token
+						httpSession.setAttribute("encryptSessionInitial", RegResponseValidateAccount.getToken());
+					}
+
+				} catch (ConnectorException e) {
+					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
+							"PortalDetailsResponseImpl.checkCompleteRegisterPermission.checkAccountValidation-initial",
+							"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
+					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
+					;
+				}
+
+			}
+			// ending
+			// as approval group first login set department as "Driver" for indicator as
+			// user login
+			if (groupType.equalsIgnoreCase(AppConstants.SELF_APPROVAL_GROUP_TYPE)) {
+				Response RegResponseValidateAccount = new Response();
+				try {
+
+					RegResponseValidateAccount = portalUMEImpl.validateAccount(logonId, Request.getPassword());
+				} catch (ConnectorException e) {
+					SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc,
+							"PortalDetailsResponseImpl.checkCompleteRegisterPermission.checkAccountValidation-Approval",
+							"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(Request));
+					SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);
+				}
+				if (AppConstants.RETURN_UME_TRUE.equals(RegResponseValidateAccount.getReturnUME())) { // if pass
+																										// validation,
+																										// update
+																										// Department
+																										// value as
+																										// indicator
+					// httpSession.setAttribute("encryptSession", RegResponse.getToken());
+					portalUMEImpl.updateUserDepartment(logonId);
+				}
+
+			}
+		}
+
+		RegResponse.setGroupType(groupType);
+		return RegResponse;
+	}
+
 	public String getGoogleGeoTest(String request) {
 
 		SocketAddress addr = new InetSocketAddress("lpautmg0001.ap.leaseplancorp.net", 8080);
@@ -1234,6 +1369,157 @@ public class PortalServiceImpl implements PortalService {
 			response.setAppStatus(AppConstants.RETURN_FALSE);
 		}
 		return response;
+
+	}
+
+	@Override
+	public String getUserGroup(String userId) {
+		IUserMaint userInfo = portalUMEImpl.getUserInfo(userId);
+		String groupRole = "";
+		if (userInfo != null) { // can't find user in portal
+			groupRole = portalUMEImpl.checkGroup(userId);
+		}
+		return groupRole;
+	}
+
+	@Override
+	public Response updateUser2VerifiedGroups(Request request) {
+		// TODO Auto-generated method stub
+
+		try {
+			this.assignPortalGroupRole(request.getLogonId(), AppConstants.SELF_CONTINUING_COMPLETE_GROUP, true);
+		} catch (NoSuchUserException | NoSuchUserAccountException nsuex) {
+			// TODO: Handle NoSuchUserException.
+			Response response = new Response(); //// Error type 1 Call LP ...
+			response.setErrReason(AppConstants.MSG_NO_USER_EXISTS);
+			response.setErrCode(AppConstants.ERROR_CODE_NoSuchUserException);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.updateUserGroups",
+					"Call PortalServiceImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsuex);
+			return response;
+		} catch (NoSuchGroupException nsrex) {
+			// TODO: Handle NoSuchRoleException.
+			Response response = new Response(); //// Error type 2 Call LP ...
+			response.setErrReason(AppConstants.MSG_NO_ROLE_FOUND);
+			response.setErrCode(AppConstants.ERROR_CODE_NoSuchRoleException);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.updateUserGroups",
+					"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", nsrex);
+			return response;
+
+		} catch (AttributeValueAlreadyExistsException avaeex) {
+
+			Response response = new Response();
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setErrCode(AppConstants.ERROR_CODE_AttributeValueAlreadyExistsException);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.updateUserGroups",
+					"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", avaeex);
+			return response;
+		} catch (UMException | UMRuntimeException umex) {
+			// TODO: Handle UMException.
+			Response response = new Response(); // Error type 2 Call LP ...
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setErrCode(AppConstants.ERROR_CODE_UMException);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_TRUE);
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.updateUserGroups",
+					"Call PortalUMEImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", umex);
+			return response;
+		}
+
+		Response response = new Response();
+		response.setReturnUME(AppConstants.RETURN_UME_TRUE);
+		return response;
+
+	}
+
+	private void assignPortalGroupRole(String logonId, String groupUniqueName, boolean removePreGroup)
+			throws NoSuchUserException, NoSuchUserAccountException, NoSuchGroupException,
+			AttributeValueAlreadyExistsException, UMException, UMRuntimeException {
+
+		IUserFactory userFactory = UMFactory.getUserFactory();
+		IGroupFactory groupFactory = UMFactory.getGroupFactory();
+
+		IUser user = userFactory.getUserByLogonID(logonId);
+		IGroup group = groupFactory.getGroupByUniqueName(groupUniqueName);
+
+		// Check if the user is already assigned directly to this group.
+		if (!group.isMember(user.getUniqueID(), false)) {
+
+			// Get a modifiable group object from the UME.
+			group = groupFactory.getMutableGroup(group.getUniqueID());
+
+			// Make the user a direct member of the group.
+			if (removePreGroup) {
+				IGroup preGroup = null;
+				if (AppConstants.SELF_CONTINUING_COMPLETE_GROUP.equalsIgnoreCase(groupUniqueName)) {
+					preGroup = groupFactory.getGroupByUniqueName(AppConstants.SELF_INIT_GROUP);
+				} else if (AppConstants.SELF_PENDING_GROUP.equalsIgnoreCase(groupUniqueName)
+						|| AppConstants.SELF_APPROVAL_GROUP.equalsIgnoreCase(groupUniqueName)) {
+					preGroup = groupFactory.getGroupByUniqueName(AppConstants.SELF_CONTINUING_COMPLETE_GROUP);
+				}
+
+				if (preGroup != null && preGroup.isMember(user.getUniqueID(), false)) {
+					SimpleLogger.trace(Severity.INFO, loc,
+							" - take previous group " + preGroup + " away from :" + user.getUniqueID());
+					preGroup = groupFactory.getMutableGroup(preGroup.getUniqueID());
+					preGroup.removeMember(user.getUniqueID());
+					preGroup.save();
+					preGroup.commit();
+				}
+			}
+			group.addMember(user.getUniqueID());
+			/*
+			 * Write the changes to the database. Note: If the user was already added to
+			 * this group on another cluster node while between the check in the 'if'
+			 * statement and now, an AttributeValueAlreadyExistsException occurs.
+			 */
+			group.save();
+			group.commit();
+		}
+	}
+
+	@Override
+	public Response getBPinfo(String loginId) {
+		Response response;
+		Response resJCO;
+		Request request = new Request();
+		try {
+			IUserMaint userInfo = portalUMEImpl.getUserInfo(loginId);
+			if (userInfo == null) { // can't find user in portal
+				response = new Response();
+				response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+				response.setErrCode(AppConstants.ERROR_CODE_LoginIDNotFound);
+				return response;
+			} else {
+				request.setFirstName(userInfo.getFirstName());
+				request.setLastName(userInfo.getLastName());
+				request.setEmailAddress(loginId);
+				response = new Response();
+				response.setReturnUME(AppConstants.RETURN_UME_TRUE);
+			}
+			resJCO = portalJCOImpl.callGetBPInfo(request);
+			return resJCO;
+		} catch (ConnectorException ec) {
+			// TODO Auto-generated catch block
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.getBPinfo",
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
+			response = new Response();
+			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
+			return response;
+		}
 
 	}
 }

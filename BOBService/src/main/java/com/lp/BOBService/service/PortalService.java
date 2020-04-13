@@ -17,8 +17,6 @@ public interface PortalService {
 
 	Response initialiseUser(Request Request);
 
-	Response createUMEIdentity(Request Request);
-
 	Response verifyInitialUser(Request Request);
 
 	Response verifyToken(Request Request);
@@ -42,8 +40,7 @@ public interface PortalService {
 	Response checkEncryptSession(Request Request);
 
 	Response checkCompleteRegisterPermission(Request Request);
-
-	Response validateAccount(String loginId,String password);
+	Response setCompleteRegisterPermission(Request Request);
 
 	Response checkPortalAccountUnique(String loginId);
 
@@ -62,4 +59,14 @@ public interface PortalService {
 
 	Response getDrivers(Request Request);
 
+	String getUserGroup(String userId);
+
+	Response updateUser2VerifiedGroups(Request Request);
+
+	// Auth0
+	Response createUMEIdentity(Request Request);
+
+	Response validateAccount(String loginId, String password);
+
+	Response getBPinfo(String loginId);
 }

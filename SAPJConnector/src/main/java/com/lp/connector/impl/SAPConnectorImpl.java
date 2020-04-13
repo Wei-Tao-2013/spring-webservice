@@ -32,6 +32,8 @@ public class SAPConnectorImpl implements SAPConnector {
 	private static String ABAP_Z_SELFREG_MANDATORY_INDICATOR = "Z_SELFREG_FIELD_CHECK";
 	private static String ABAP_Z_SELFREG_ADDRESS_CHECK = "Z_SELFREG_COMPLETE_CHECK";
 	private static String ABAP_Z_SELFREG_INIT_ALLOW_EMAIL = "Z_SELFREG_INIT_ALLOW_EMAIL";
+	private static String ABAP_Z_AUTH0_BP_INFO = "ZUI_FIND_USER_EMAIL";
+	
 
 	/*
 	 * (non-Javadoc)
@@ -397,9 +399,6 @@ public class SAPConnectorImpl implements SAPConnector {
 					.append(" ], EV_REASON[ ").append(evReason).append(" ]");
 
 			SimpleLogger.trace(Severity.INFO, location, method + " - with Retrieve data :" + strRetrieve.toString());
-			// End Call FM
-			// Assemble Response Object
-			// Assemble Response Object
 			cConResponse.setReturnCRM(rvResult);
 			cConResponse.setErrReason(evReason);
 			// End of Assembling
@@ -1142,6 +1141,88 @@ public class SAPConnectorImpl implements SAPConnector {
 							+ strRetrieve.toString() + " - response data with "
 							+ ConnectorUtils.converToJson(cConResponse));
 			SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoException);
+			cConResponse.setReturnCRM("false");
+			cConResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			cConResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+
+		} finally {
+			// TODO Object clean up task
+			location.exiting(method);
+		}
+		return cConResponse;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.lp.connector.SAPConnector#callGetBPInfo(com.lp.connector.
+	 * model.SAPConnectorRequest)
+	 */
+
+	@Override
+	public SAPConnectorResponse callGetBPInfo(SAPConnectorRequest cConReq) throws ConnectorException {
+	
+		// TODO Auto-generated method stub
+		String method = "Auth0-callGetBPInfo";
+		location.entering(method);
+		SimpleLogger.trace(Severity.INFO, location,
+				method + " - with request parameters :" + ConnectorUtils.converToJson(cConReq));
+
+		// Call Function Module
+		StringBuffer strRetrieve = new StringBuffer();
+		SAPConnectorResponse cConResponse = new SAPConnectorResponse();
+		ServiceLocator serviceLocator = ServiceLocator.getInstance();
+		JCoDestination jCoDestination = serviceLocator.getJavaConnectorObject();
+		try {
+		
+			// Call Function Module
+
+			JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(ABAP_Z_AUTH0_BP_INFO);
+			// If Call Function module is null, then throw error or return
+			if (jCoFunction == null) {
+				// TODO ("Function module not found in SAP.");
+				throw new ConnectorException("Technical issue, " + "Function module " + ABAP_Z_AUTH0_BP_INFO
+						+ " not found in SAP");
+			}
+			// Set parameters for calling FM
+			jCoFunction.getImportParameterList().setValue("IV_USERID", cConReq.getEmailAddress());
+		//	jCoFunction.getImportParameterList().setValue("IV_FIRSTNAME", cConReq.getFirstName());
+		//	jCoFunction.getImportParameterList().setValue("IV_LASTNAME", cConReq.getLastName());
+			
+			// Execute the FM
+			
+			SimpleLogger.trace(Severity.INFO, location,
+					method + "Executing FM[" + ABAP_Z_AUTH0_BP_INFO + "] with parameters["
+							+ cConReq.getEmailAddress() +"]");
+
+			jCoFunction.execute(jCoDestination);
+
+			// Retrieve the return values from CRM
+			String rvEmail = jCoFunction.getExportParameterList().getString("EV_EMAIL");
+			String rvMsg = jCoFunction.getExportParameterList().getString("EV_RETURN_MSG");
+			String rvResult = jCoFunction.getExportParameterList().getString("RV_SUCCESS");
+		
+
+			strRetrieve.append("CRM retrieved following values, RV_SUCCESS[ ").append(rvResult)
+					.append(" ], EV_EMAIL[ ").append(rvEmail)
+					.append(" ], RV_RETURN_MSG[ ").append(rvMsg).append(" ]");
+
+			SimpleLogger.trace(Severity.INFO, location, method + " - with Retrieve data :" + strRetrieve.toString());
+	
+			// End Call FM
+			// Assemble Response Object
+			cConResponse.setReturnCRM(rvResult);
+			cConResponse.setErrReason(rvMsg);
+			cConResponse.setEmailAddress(rvEmail);
+			
+		} catch (Exception jCoException) {
+			SimpleLogger.trace(Severity.ERROR, location,
+					method + " - request with " + ConnectorUtils.converToJson(cConReq) + " - data retrieve with "
+							+ strRetrieve.toString() + " - response data with "
+							+ ConnectorUtils.converToJson(cConResponse));
+			SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoException);
+
 			cConResponse.setReturnCRM("false");
 			cConResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
 			cConResponse.setErrReason(AppConstants.CALL_LEASEPLAN);

@@ -1,4 +1,4 @@
-package com.lp.BOBService.selfRegistration;
+package com.lp.BOBService.components;
 
 import com.lp.connector.exception.ConnectorException;
 import com.lp.BOBService.model.Request;
