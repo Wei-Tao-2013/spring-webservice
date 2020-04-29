@@ -1522,4 +1522,17 @@ public class PortalServiceImpl implements PortalService {
 		}
 
 	}
+
+	@Override
+	public String getAuth0Token(String cecrete) {
+		// TODO Auto-generated method stub
+		return AppData.auth0Token.get(cecrete) != null ?  AppData.auth0Token.get(cecrete) : "none";
+	}
+
+	@Override
+	public String storeAuth0Token(String cecrete, String auth0token) {
+		// TODO Auto-generated method stub
+		AppData.auth0Token.put(cecrete,auth0token);
+		return auth0token;
+	}
 }

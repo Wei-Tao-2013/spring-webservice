@@ -13,6 +13,9 @@ public class AppData implements Serializable {
 	/** System Exceptions **/
 	public static String googleAPI = "false";
 	public static String Mandatory = "true";
+	//public static String auth0Token ="";
+	public static HashMap<String,String> auth0Token = new HashMap<String,String>();
+
 
 	public static int maxNumberEmailSent = 3;
 	public static int requestInterval = 5000;

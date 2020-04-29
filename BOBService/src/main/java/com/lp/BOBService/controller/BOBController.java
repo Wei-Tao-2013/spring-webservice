@@ -12,6 +12,7 @@ import com.lp.BOBService.model.Request;
 import com.lp.BOBService.model.Response;
 import com.lp.BOBService.service.PortalService;
 
+import org.aspectj.apache.bcel.classfile.Constant;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,8 @@ public class BOBController {
 	private String clientId;
 	@Value(value = "${encrypted.auth0.clientSecret}")
 	private String clientSecret;
+	@Value(value = "${auth0.issuer}")
+    private String  issuer;
 
 	@Autowired
 	private PortalService portalService;
@@ -66,7 +69,6 @@ public class BOBController {
 	@RequestMapping(value = "/ume/api/drivers", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody Response getDrivers(@RequestBody Request Request) throws Throwable {
 		Response res = portalService.getDrivers(Request);
-
 		return res;
 	}
 
@@ -87,6 +89,22 @@ public class BOBController {
 	public @ResponseBody String getUserSGroup(@PathVariable("userId") String userId) throws Throwable {
 		return portalService.getUserGroup(userId);
 	}
+
+	//get access_token as per client Id
+	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
+	@RequestMapping(value = "/ume/public/accessToken/{secret}", method = RequestMethod.GET, headers = "Accept=text/plain")
+	public @ResponseBody String getAccessToken(@PathVariable("secret") String secret) throws Throwable {
+		return portalService.getAuth0Token(secret);
+	}
+
+	//get access_token as per client Id
+	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
+	@RequestMapping(value = "/ume/public/accessToken/{secret}/{auth0Token}", method = RequestMethod.PUT, headers = "Accept=text/plain")
+	public @ResponseBody String storeAccessToken(@PathVariable("secret") String secret,@PathVariable("auth0Token") String auth0Token) throws Throwable {
+		return portalService.storeAuth0Token(secret,auth0Token);
+	}
+
+
 
 	// update user's group on protal
 	@RequestMapping(value = "/ume/api/users/verifiedGroups", method = RequestMethod.PATCH, headers = "Accept=application/json")

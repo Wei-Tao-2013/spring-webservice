@@ -69,4 +69,7 @@ public interface PortalService {
 	Response validateAccount(String loginId, String password);
 
 	Response getBPinfo(String loginId);
+
+	String getAuth0Token(String secret);
+	String storeAuth0Token(String secret, String auth0token);
 }
