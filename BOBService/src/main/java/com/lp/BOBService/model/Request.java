@@ -73,5 +73,9 @@ public class Request implements java.io.Serializable {
 	private String salesforceInstanceUrl;
 	private String salesforceRefreshToken;
 	private String salesforceSignature;
+
+   //caching auth0 Token
+   private String secret;
+   private String auth0Token;
 	
 }

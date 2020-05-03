@@ -105,6 +105,14 @@ public class BOBController {
 	}
 
 
+	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
+	@RequestMapping(value = "/ume/public/accessToken/{secret}/{auth0Token}", method = RequestMethod.PUT,  headers = "Accept=application/json" )
+	public @ResponseBody String cacheAccessToken(@RequestBody Request request) throws Throwable {
+
+		return portalService.storeAuth0Token(request.getSecret(),request.getAuth0Token());
+	}
+
+
 
 	// update user's group on protal
 	@RequestMapping(value = "/ume/api/users/verifiedGroups", method = RequestMethod.PATCH, headers = "Accept=application/json")

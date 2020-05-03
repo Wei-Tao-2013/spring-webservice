@@ -1524,15 +1524,19 @@ public class PortalServiceImpl implements PortalService {
 	}
 
 	@Override
-	public String getAuth0Token(String cecrete) {
+	public String getAuth0Token(String secret) {
 		// TODO Auto-generated method stub
-		return AppData.auth0Token.get(cecrete) != null ?  AppData.auth0Token.get(cecrete) : "none";
+		SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.getAuth0Token",
+		"Call PortalServiceImpl with request of " + AppData.auth0Token.get(secret));
+		return AppData.auth0Token.get(secret) != null ?  AppData.auth0Token.get(secret) : "none";
 	}
 
 	@Override
-	public String storeAuth0Token(String cecrete, String auth0token) {
+	public String storeAuth0Token(String secret, String auth0token) {
 		// TODO Auto-generated method stub
-		AppData.auth0Token.put(cecrete,auth0token);
+		SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.storeAuth0Token",
+		"Call PortalServiceImpl with request of " + auth0token);
+		AppData.auth0Token.put(secret,auth0token);
 		return auth0token;
 	}
 }
