@@ -90,25 +90,18 @@ public class BOBController {
 		return portalService.getUserGroup(userId);
 	}
 
-	//get access_token as per client Id
+	//get access_token as per secret key
 	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
 	@RequestMapping(value = "/ume/public/accessToken/{secret}", method = RequestMethod.GET, headers = "Accept=text/plain")
 	public @ResponseBody String getAccessToken(@PathVariable("secret") String secret) throws Throwable {
 		return portalService.getAuth0Token(secret);
 	}
 
-	//get access_token as per client Id
-	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
-	@RequestMapping(value = "/ume/public/accessToken/{secret}/{auth0Token}", method = RequestMethod.PUT, headers = "Accept=text/plain")
-	public @ResponseBody String storeAccessToken(@PathVariable("secret") String secret,@PathVariable("auth0Token") String auth0Token) throws Throwable {
-		return portalService.storeAuth0Token(secret,auth0Token);
-	}
-
-
-	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
-	@RequestMapping(value = "/ume/public/accessToken/{secret}/{auth0Token}", method = RequestMethod.PUT,  headers = "Accept=application/json" )
+	
+    // store auth0 token with secret key
+	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") 
+	@RequestMapping(value = "/ume/public/accessToken", method = RequestMethod.PUT,  headers = "Accept=application/json" )
 	public @ResponseBody String cacheAccessToken(@RequestBody Request request) throws Throwable {
-
 		return portalService.storeAuth0Token(request.getSecret(),request.getAuth0Token());
 	}
 
