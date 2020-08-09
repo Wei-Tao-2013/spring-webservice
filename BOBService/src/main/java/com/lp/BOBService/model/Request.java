@@ -77,5 +77,7 @@ public class Request implements java.io.Serializable {
    //caching auth0 Token
    private String secret;
    private String auth0Token;
+
+   private String auth0BPEmail;
 	
 }

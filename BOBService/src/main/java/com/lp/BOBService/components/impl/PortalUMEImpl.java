@@ -766,9 +766,12 @@ public class PortalUMEImpl implements PortalUME {
 
 			IGroup groupApproval = groupFactory.getGroupByUniqueName(AppConstants.SELF_APPROVAL_GROUP);
 
+			IGroup groupTelstra = groupFactory.getGroupByUniqueName(AppConstants.TESLTRA_GROUP);
+
+
 			// Check if the user is already assigned directly to this group.
 
-			if (groupApproval.isMember(user.getUniqueID(), false)) {
+		 if (groupApproval.isMember(user.getUniqueID(), false)) {
 				groupType = AppConstants.SELF_APPROVAL_GROUP_TYPE;
 			} else if (groupPending.isMember(user.getUniqueID(), false)) {
 				groupType = AppConstants.SELF_PENDING_GROUP_TYPE;
@@ -776,6 +779,8 @@ public class PortalUMEImpl implements PortalUME {
 				groupType = AppConstants.SELF_COMPLETED_GROUP_TYPE;
 			} else if (groupInitial.isMember(user.getUniqueID(), false)) {
 				groupType = AppConstants.SELF_INIT_GROUP_TYPE;
+			} else if (groupTelstra.isMember(user.getUniqueID(), false)) {
+				groupType = AppConstants.TESTRA_GROUP_TYPE;
 			}
 
 		} catch (UMException ux) {

@@ -36,4 +36,7 @@ public abstract interface PortalJCO {
 	// get BP info from CRM
 	public abstract Response callGetBPInfo(Request request) throws ConnectorException;
 
+	// update BP info into CRM
+	public abstract Response callSetBPInfo(Request request) throws ConnectorException;
+
 }

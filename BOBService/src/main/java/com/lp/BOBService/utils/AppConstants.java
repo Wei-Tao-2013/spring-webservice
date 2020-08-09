@@ -73,11 +73,13 @@ public class AppConstants implements Serializable {
 	public static final String SELF_CONTINUING_COMPLETE_GROUP = "SelfRegistrationVerified"; // completed register
 	public static final String SELF_PENDING_GROUP = "SelfRegistrationPending"; // manual approval pending stage
 	public static final String SELF_APPROVAL_GROUP = "SelfRegistrationApproval"; // manual approval pending stage
+	public static final String TESLTRA_GROUP = "TelstraGeneral"; //Telstra group
 
 	public static final String SELF_INIT_GROUP_TYPE = "initialiseGroup"; // initialise register group type
 	public static final String SELF_COMPLETED_GROUP_TYPE = "verifiedGroup"; // completed register group type
 	public static final String SELF_PENDING_GROUP_TYPE = "pendingGroup"; // manual approval pending stage group type
 	public static final String SELF_APPROVAL_GROUP_TYPE = "approvalGroup"; // Approval stage group type
+	public static final String TESTRA_GROUP_TYPE = "telstraGroup"; // manual approval pending stage group type
 	public static final String SELF_OTHER_GROUP_TYPE = "otherGroup"; // manual approval pending stage group type
 
 	/** CRM Return status ***/

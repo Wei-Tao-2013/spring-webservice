@@ -38,6 +38,10 @@ public interface SAPConnector {
 	public abstract SAPConnectorResponse callGetBPInfo(SAPConnectorRequest SAPConnectData)
 	throws ConnectorException;
 
+	///this interface is for auth0 set BP email into CRM		
+	public abstract SAPConnectorResponse callSetBPInfo(SAPConnectorRequest SAPConnectData)
+	throws ConnectorException;
+
 	/* test only */
 	public abstract SAPConnectorResponse callCustomerValidationTest(SAPConnectorRequest SAPConnectData)
 			throws ConnectorException;

@@ -91,7 +91,7 @@ public class BOBController {
 	}
 
 	//get access_token as per secret key
-	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") // 
+	@CrossOrigin(origins ="https://leaseplan*") // 
 	@RequestMapping(value = "/ume/public/accessToken/{secret}", method = RequestMethod.GET, headers = "Accept=text/plain")
 	public @ResponseBody String getAccessToken(@PathVariable("secret") String secret) throws Throwable {
 		return portalService.getAuth0Token(secret);
@@ -99,12 +99,11 @@ public class BOBController {
 
 	
     // store auth0 token with secret key
-	@CrossOrigin(origins ="https://leaseplan-test.au.auth0.com") 
+	@CrossOrigin(origins ="https://leaseplan*") 
 	@RequestMapping(value = "/ume/public/accessToken", method = RequestMethod.PUT,  headers = "Accept=application/json" )
 	public @ResponseBody String cacheAccessToken(@RequestBody Request request) throws Throwable {
 		return portalService.storeAuth0Token(request.getSecret(),request.getAuth0Token());
 	}
-
 
 
 	// update user's group on protal
@@ -113,15 +112,7 @@ public class BOBController {
 		return portalService.updateUser2VerifiedGroups(Request);
 	}
 
-	@RequestMapping(value = "/ume/public/test", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public String publicEndpoint() {
-		return new JSONObject()
-				.put("message",
-						"All good!!!!!! You DO NOT need to be authenticated to call /api/public via proxy and port --> "
-								+ System.getProperty("https.proxyHost") + ":" + System.getProperty("https.proxyPort"))
-				.toString();
-	}
+	
 
 	// Portal UME unique check
 	@RequestMapping(value = "/ume/public/authentication/{loginId}", method = RequestMethod.GET, headers = "Accept=application/json")
@@ -151,6 +142,14 @@ public class BOBController {
 		return res;
 	}
 
+	// Set BP Information
+	@RequestMapping(value = "/ume/api/BP/{loginId}/{auth0Email}", method = RequestMethod.PUT, headers = "Accept=application/json")
+	public @ResponseBody Response getBPEndpoint(@PathVariable("loginId") String loginId,@PathVariable("auth0Email") String auth0Email ) throws Throwable {
+		Response res = portalService.setBPinfo(loginId, auth0Email);
+		return res;
+	}
+
+
 	// check if login user has permission to go complete register as per user's
 	// existing role assigned on portal
 	@RequestMapping(value = "/ume/api/registerSession", method = RequestMethod.POST, headers = "Accept=application/json")
@@ -165,34 +164,7 @@ public class BOBController {
 		return res;
 	}
 
-	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public String privateEndpoint() {
-
-		//// System.out.println("system proxy" + System.getProperty("https.proxyHost"));
-		return new JSONObject().put("message", "All good. You can see this because you are Authenticated.").toString();
-	}
-
-	@RequestMapping(value = "/ume/api/test", method = RequestMethod.PUT, produces = "application/json")
-	@ResponseBody
-	public String privateEndpointPUT() {
-		return new JSONObject().put("message", "All good for PUT. You can see this because you are Authenticated.")
-				.toString();
-	}
-
-	@RequestMapping(value = "/ume/api/test", method = RequestMethod.PATCH, produces = "application/json")
-	@ResponseBody
-	public String privateEndpointPATCH() {
-		return new JSONObject().put("message", "All good for PATCH. You can see this because you are Authenticated.")
-				.toString();
-	}
-
-	@RequestMapping(value = "/ume/api/test", method = RequestMethod.POST, produces = "application/json")
-	@ResponseBody
-	public String privateEndpointPOST() {
-		return new JSONObject().put("message", "All good for POST. You can see this because you are Authenticated.")
-				.toString();
-	}
+	
 
 	@RequestMapping(value = "/ume/api-scoped/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody

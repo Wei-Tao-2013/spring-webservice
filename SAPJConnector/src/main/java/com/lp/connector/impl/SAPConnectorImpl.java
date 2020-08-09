@@ -33,6 +33,7 @@ public class SAPConnectorImpl implements SAPConnector {
 	private static String ABAP_Z_SELFREG_ADDRESS_CHECK = "Z_SELFREG_COMPLETE_CHECK";
 	private static String ABAP_Z_SELFREG_INIT_ALLOW_EMAIL = "Z_SELFREG_INIT_ALLOW_EMAIL";
 	private static String ABAP_Z_AUTH0_BP_INFO = "ZUI_FIND_USER_EMAIL";
+	private static String ABAP_Z_AUTH0_SET_BP_INFO = "ZUI_SET_USER_EMAIL";
 	
 
 	/*
@@ -1187,9 +1188,6 @@ public class SAPConnectorImpl implements SAPConnector {
 			}
 			// Set parameters for calling FM
 			jCoFunction.getImportParameterList().setValue("IV_USERID", cConReq.getEmailAddress());
-		//	jCoFunction.getImportParameterList().setValue("IV_FIRSTNAME", cConReq.getFirstName());
-		//	jCoFunction.getImportParameterList().setValue("IV_LASTNAME", cConReq.getLastName());
-			
 			// Execute the FM
 			
 			SimpleLogger.trace(Severity.INFO, location,
@@ -1215,6 +1213,75 @@ public class SAPConnectorImpl implements SAPConnector {
 			cConResponse.setReturnCRM(rvResult);
 			cConResponse.setErrReason(rvMsg);
 			cConResponse.setEmailAddress(rvEmail);
+			
+		} catch (Exception jCoException) {
+			SimpleLogger.trace(Severity.ERROR, location,
+					method + " - request with " + ConnectorUtils.converToJson(cConReq) + " - data retrieve with "
+							+ strRetrieve.toString() + " - response data with "
+							+ ConnectorUtils.converToJson(cConResponse));
+			SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoException);
+
+			cConResponse.setReturnCRM("false");
+			cConResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			cConResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+
+		} finally {
+			// TODO Object clean up task
+			location.exiting(method);
+		}
+		return cConResponse;
+	}
+
+	@Override
+	public SAPConnectorResponse callSetBPInfo(SAPConnectorRequest cConReq) throws ConnectorException {
+		// TODO Auto-generated method stub
+		String method = "Auth0-callSetBPInfo";
+		location.entering(method);
+		SimpleLogger.trace(Severity.INFO, location,
+				method + " - with request parameters :" + ConnectorUtils.converToJson(cConReq));
+
+		// Call Function Module
+		StringBuffer strRetrieve = new StringBuffer();
+		SAPConnectorResponse cConResponse = new SAPConnectorResponse();
+		ServiceLocator serviceLocator = ServiceLocator.getInstance();
+		JCoDestination jCoDestination = serviceLocator.getJavaConnectorObject();
+		try {
+			// Call Function Module
+			JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(ABAP_Z_AUTH0_SET_BP_INFO);
+			// If Call Function module is null, then throw error or return
+			if (jCoFunction == null) {
+				// TODO ("Function module not found in SAP.");
+				throw new ConnectorException("Technical issue, " + "Function module " + ABAP_Z_AUTH0_SET_BP_INFO
+						+ " not found in SAP");
+			}
+
+			// Set parameters for calling FM
+			jCoFunction.getImportParameterList().setValue("IV_INTERNET_USR", cConReq.getEmailAddress());
+			jCoFunction.getImportParameterList().setValue("IV_EMAIL", cConReq.getAuth0BPEmail());
+			// Execute the FM
+			
+			SimpleLogger.trace(Severity.INFO, location,
+					method + "Executing FM[" + ABAP_Z_AUTH0_SET_BP_INFO + "] with parameters["
+							+ cConReq.getEmailAddress() +"] , ["
+							+ cConReq.getAuth0BPEmail() +"]" );
+
+			jCoFunction.execute(jCoDestination);
+
+			// Retrieve the return values from CRM
+			String evSuccess = jCoFunction.getExportParameterList().getString("EV_SUCCESS");
+			String etReturn = jCoFunction.getExportParameterList().getString("ET_RETURN");
+			
+			strRetrieve.append("CRM retrieved following values, evSuccess[ ").append(evSuccess)
+					.append(" ], evReturn[ ").append(etReturn);
+				
+
+			SimpleLogger.trace(Severity.INFO, location, method + " - with Retrieve data :" + strRetrieve.toString());
+	
+			// End Call FM
+			// Assemble Response Object
+			cConResponse.setReturnCRM(evSuccess);
+			cConResponse.setErrReason(etReturn);
+		
 			
 		} catch (Exception jCoException) {
 			SimpleLogger.trace(Severity.ERROR, location,

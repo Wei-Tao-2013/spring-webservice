@@ -292,4 +292,19 @@ public class PortalJCOImpl implements PortalJCO {
 		return response;
 	}
 
+	@Override
+	public Response callSetBPInfo(Request request) throws ConnectorException {
+		// TODO Auto-generated method stub
+		SAPConnector sapConnector = new SAPConnectorImpl();
+		SAPConnectorRequest sapReq = new SAPConnectorRequest();
+		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(request, sapReq);
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Call callGetBPInfo from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
+		SAPConnectorResponse sapResponse = sapConnector.callSetBPInfo(sapReq);
+		SimpleLogger.trace(Severity.INFO, loc, "Response from callgetBP info to PortalJCOImpl with Json data"
+				+ ServiceUtils.converToJson(sapResponse));
+		Response response = convertJcoResponse(sapResponse);
+		return response;
+	}
+
 }

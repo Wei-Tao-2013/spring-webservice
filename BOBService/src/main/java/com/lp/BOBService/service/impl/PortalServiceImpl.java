@@ -1539,4 +1539,40 @@ public class PortalServiceImpl implements PortalService {
 		AppData.auth0Token.put(secret,auth0token);
 		return auth0token;
 	}
+
+	@Override
+	public Response setBPinfo(String loginId, String auth0BPEmail) {
+		Response response;
+		Response resJCO;
+		Request request = new Request();
+		try {
+			IUserMaint userInfo = portalUMEImpl.getUserInfo(loginId);
+			if (userInfo == null) { // can't find user in portal
+				response = new Response();
+				response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+				response.setErrCode(AppConstants.ERROR_CODE_LoginIDNotFound);
+				return response;
+			} else {
+				request.setFirstName(userInfo.getFirstName());
+				request.setLastName(userInfo.getLastName());
+				request.setEmailAddress(loginId);
+				request.setAuth0BPEmail(auth0BPEmail);
+				response = new Response();
+				response.setReturnUME(AppConstants.RETURN_UME_TRUE);
+			}
+			resJCO = portalJCOImpl.callSetBPInfo(request);
+			return resJCO;
+		} catch (ConnectorException ec) {
+			// TODO Auto-generated catch block
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.setBPinfo",
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
+			response = new Response();
+			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
+			return response;
+		}
+	}
 }
