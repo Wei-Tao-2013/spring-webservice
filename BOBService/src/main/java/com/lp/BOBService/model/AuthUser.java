@@ -22,5 +22,7 @@ public class AuthUser implements java.io.Serializable {
 	private String emailAddress;
 	private String authentication; // true vs false
 	private String status;
+	private String firstName;
+	private String lastName;
 
 }

@@ -1331,6 +1331,8 @@ public class PortalServiceImpl implements PortalService {
 			authUser.setAuthentication(res.getReturnUME());
 			authUser.setLoginId(loginId);
 			authUser.setEmailAddress(loginId);
+			authUser.setFirstName("".equals(res.getFirstName())? res.getLastName() : res.getFirstName());
+			authUser.setLastName(res.getLastName());
 			authUser.setStatus(res.getErrCode());
 			response.setAuthUser(authUser);
 		} catch (ConnectorException e) {

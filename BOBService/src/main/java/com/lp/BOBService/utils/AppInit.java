@@ -36,13 +36,6 @@ public class AppInit extends HttpServlet {
 			file = getInitParameter("configurationLocation");
 			filePath = prefix + file;
 
-			// Properties p =
-			// PortalServiceUtils.readProperties("C:\\TomcatServer7\\webapps\\BOBService\\WEB-INF\\app.properties");
-			// SimpleLogger.log(Severity.INFO,Category.SYS_SERVER,loc,"","KMSETLOCATION ::
-			// "+ p.getProperty("KMSETLOCATION"));
-
-			// Properties p1 =
-			// PortalServiceUtils.readProperties(p.getProperty("KMSETLOCATION"));
 
 		} catch (Exception e) {
 			// SimpleLogger.traceThrowable(Severity.ERROR, loc, "", e);

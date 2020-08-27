@@ -1256,7 +1256,7 @@ public class SAPConnectorImpl implements SAPConnector {
 			}
 
 			// Set parameters for calling FM
-			jCoFunction.getImportParameterList().setValue("IV_INTERNET_USR", cConReq.getEmailAddress());
+			jCoFunction.getImportParameterList().setValue("IV_INTERNET_USR", cConReq.getEmailAddress().toUpperCase());
 			jCoFunction.getImportParameterList().setValue("IV_EMAIL", cConReq.getAuth0BPEmail());
 			// Execute the FM
 			
