@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @CrossOrigin
 public class BOBController {
 
-	@Value(value = "${encrypted.auth0.clientId}")
+/* 	@Value(value = "${encrypted.auth0.clientId}")
 	private String clientId;
 	@Value(value = "${encrypted.auth0.clientSecret}")
-	private String clientSecret;
+	private String clientSecret; */
 	@Value(value = "${auth0.issuer}")
     private String  issuer;
 
@@ -78,11 +78,7 @@ public class BOBController {
 		return res;
 	}
 
-	/* test only */
-	@RequestMapping(value = "/ume/{callName}", method = RequestMethod.GET, headers = "Accept=text/plain")
-	public @ResponseBody String getSayHello(@PathVariable("callName") String callName) throws Throwable {
-		return "Client id :::" + clientId + " Secret :::" + clientSecret;
-	}
+	
 
 	// get user's group on portal
 	@RequestMapping(value = "/ume/api/users/{userId}/groups", method = RequestMethod.GET, headers = "Accept=text/plain")
@@ -135,6 +131,15 @@ public class BOBController {
 		return res;
 	}
 
+	// Portal UME authentication
+	@RequestMapping(value = "/ume/public/authentication/{loginId}/{password}", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody Response authenticationPubEndpoint(@PathVariable("loginId") String loginId,
+			@PathVariable("password") String password) throws Throwable {
+		Response res = portalService.validateAccount(loginId, password);
+		return res;
+	}
+
+
 	// Get BP Information
 	@RequestMapping(value = "/ume/api/BP/{loginId}", method = RequestMethod.GET, headers = "Accept=application/json")
 	public @ResponseBody Response getBPEndpoint(@PathVariable("loginId") String loginId) throws Throwable {
@@ -165,8 +170,20 @@ public class BOBController {
 	}
 
 	
+	@RequestMapping(value = "/ume/api/tokenValidation", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody String getTokenValidation() throws Throwable {
+	    return "OK";
+	}
 
-	@RequestMapping(value = "/ume/api-scoped/test", method = RequestMethod.GET, produces = "application/json")
+	/* @RequestMapping(value = "/ume/api-scoped/test", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public String privateScopedEndpoint() {
+		return new JSONObject().put("message",
+				"All good. You can see this because you are Authenticated with a Token granted the 'read:messages' scope")
+				.toString();
+	} */
+
+	@RequestMapping(value = "/ume/api/test", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public String privateScopedEndpoint() {
 		return new JSONObject().put("message",
