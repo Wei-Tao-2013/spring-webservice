@@ -131,13 +131,26 @@ public class BOBController {
 		return res;
 	}
 
+	@RequestMapping(value = "/ume/api/authentication", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody Response authenticationV2Endpoint(@RequestBody Request request) throws Throwable {
+		Response regResponse = new Response();
+		//regResponse.setToken(Request.getPassword());
+		Response res = portalService.validateAccount(request.getLogonId(), request.getPassword());
+		return res;
+	}
+
+
+
+
 	// Portal UME authentication
+	/*
 	@RequestMapping(value = "/ume/public/authentication/{loginId}/{password}", method = RequestMethod.GET, headers = "Accept=application/json")
 	public @ResponseBody Response authenticationPubEndpoint(@PathVariable("loginId") String loginId,
 			@PathVariable("password") String password) throws Throwable {
 		Response res = portalService.validateAccount(loginId, password);
 		return res;
 	}
+	*/
 
 
 	// Get BP Information
@@ -147,10 +160,25 @@ public class BOBController {
 		return res;
 	}
 
+	// Get BP Information v2
+	@RequestMapping(value = "/ume/api/BP", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody Response getBPV2Endpoint(@RequestBody Request request) throws Throwable {
+		Response res = portalService.getBPinfo(request.getLogonId());
+		return res;
+	}
+
+
 	// Set BP Information
 	@RequestMapping(value = "/ume/api/BP/{loginId}/{auth0Email}", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public @ResponseBody Response getBPEndpoint(@PathVariable("loginId") String loginId,@PathVariable("auth0Email") String auth0Email ) throws Throwable {
 		Response res = portalService.setBPinfo(loginId, auth0Email);
+		return res;
+	}
+
+	// Set BP Information
+	@RequestMapping(value = "/ume/api/BP", method = RequestMethod.PUT, headers = "Accept=application/json")
+	public @ResponseBody Response setBPV2Endpoint(@RequestBody Request request) throws Throwable {
+		Response res = portalService.setBPinfo(request.getLogonId(), request.getAuth0BPEmail());
 		return res;
 	}
 
