@@ -1528,15 +1528,13 @@ public class PortalServiceImpl implements PortalService {
 	@Override
 	public String getAuth0Token(String secret) {
 		// TODO Auto-generated method stub
-		SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.getAuth0Token",
-		"Call PortalServiceImpl with request of " + AppData.auth0Token.get(secret));
 		return AppData.auth0Token.get(secret) != null ?  AppData.auth0Token.get(secret) : "none";
 	}
 
 	@Override
 	public String storeAuth0Token(String secret, String auth0token) {
 		// TODO Auto-generated method stub
-		SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "PortalServiceImpl.storeAuth0Token",
+		SimpleLogger.log(Severity.INFO, Category.SYS_LOGGING, loc, "PortalServiceImpl.storeAuth0Token",
 		"Call PortalServiceImpl with request of " + auth0token);
 		AppData.auth0Token.put(secret,auth0token);
 		return auth0token;
