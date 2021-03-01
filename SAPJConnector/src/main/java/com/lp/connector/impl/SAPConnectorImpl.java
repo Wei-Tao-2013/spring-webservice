@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.ArrayList;
 import com.lp.connector.SAPConnector;
 import com.lp.connector.exception.ConnectorException;
+import com.sap.conn.jco.JCoRuntimeException;
+
+
 import com.lp.connector.model.CustomerData;
 import com.lp.connector.model.SAPConnectorRequest;
 import com.lp.connector.model.SAPConnectorResponse;
@@ -16,9 +19,11 @@ import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoStructure;
 import com.sap.conn.jco.JCoTable;
+import com.sap.conn.jco.JCoField;
 import com.sap.tc.logging.Location;
 import com.sap.tc.logging.Severity;
 import com.sap.tc.logging.SimpleLogger;
+import java.util.Iterator;
 
 public class SAPConnectorImpl implements SAPConnector {
 	private static final Location location = Location.getLocation(SAPConnectorImpl.class);
@@ -34,6 +39,7 @@ public class SAPConnectorImpl implements SAPConnector {
 	private static String ABAP_Z_SELFREG_INIT_ALLOW_EMAIL = "Z_SELFREG_INIT_ALLOW_EMAIL";
 	private static String ABAP_Z_AUTH0_BP_INFO = "ZUI_FIND_USER_EMAIL";
 	private static String ABAP_Z_AUTH0_SET_BP_INFO = "ZUI_SET_USER_EMAIL";
+	private static String ABAP_FM_TELSTRA_USER_REGISTRATION = "ZTELSTRA_USER_REGISTRATION";
 	
 
 	/*
@@ -1300,5 +1306,192 @@ public class SAPConnectorImpl implements SAPConnector {
 		}
 		return cConResponse;
 	}
+
+	@Override
+	public SAPConnectorResponse callFindBusinessPartnerForLogonId(SAPConnectorRequest cConReq) throws ConnectorException {
+		// TODO Auto-generated method stub
+		String method = "Telstra::findBusinessPartnerForLogonId";
+		location.entering(method);
+		SimpleLogger.trace(Severity.INFO, location,
+				method + "Telstra:: - with request parameters :" + ConnectorUtils.converToJson(cConReq));
+
+		// Call Function Module
+		StringBuffer strRetrieve = new StringBuffer();
+		SAPConnectorResponse cConResponse = new SAPConnectorResponse();
+		ServiceLocator serviceLocator = ServiceLocator.getInstance();
+		JCoDestination jCoDestination = serviceLocator.getJavaConnectorObject();
+
+		try {
+			// Call Function Module
+			JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(ABAP_FM_TELSTRA_USER_REGISTRATION);
+			// If Call Function module is null, then throw error or return
+			if (jCoFunction == null) {
+				// TODO ("Function module not found in SAP.");
+				throw new ConnectorException("Technical issue, " + "Function module " + ABAP_FM_TELSTRA_USER_REGISTRATION
+						+ " not found in SAP");
+			}
+
+			// Set parameters for calling FM
+			jCoFunction.getImportParameterList().setValue("LOGONID", cConReq.getTelstraId()); // Logon Id enter by the user
+	        jCoFunction.getImportParameterList().setValue("ACTION", "CHECK"); // Check action parameter for find if BP exist for logon id 
+			// Execute the FM
+	
+			SimpleLogger.trace(Severity.INFO, location,
+					method + "Telstra:: CHECK Executing FM[" + ABAP_FM_TELSTRA_USER_REGISTRATION + "] with parameters["
+							+ cConReq.getTelstraId() +"] " );
+
+			jCoFunction.execute(jCoDestination);
+
+			// Retrieve the return values from CRM
+			  // Check if BP exist
+			String bpStatus  = jCoFunction.getExportParameterList().getString("NO_BP");
+			// Check if Internet user profile already exist
+			String internetUserStatus 	= jCoFunction.getExportParameterList().getString("IUSER_EXIST");
+			if("X".equalsIgnoreCase(bpStatus)) {
+				SimpleLogger.trace(Severity.INFO, location, method + "Telstra:: Telstra LAN logon ID["+ cConReq.getTelstraId() + "] is not recognised due to no BP found in the CRM system.");
+				cConResponse.setReturnCRM("false");
+				cConResponse.setErrCode("001");
+				cConResponse.setErrReason("Telstra LAN logon ID["+ cConReq.getTelstraId() + "] is not recognised due to no BP found in the CRM system.");  	
+			} else if("X".equalsIgnoreCase(internetUserStatus)) {
+				SimpleLogger.trace(Severity.INFO, location, method + "Telstra:: Found issue with your Telstra LAN logon ID[" + cConReq.getTelstraId() + "]. Internet user profile already exist in the CRM system.");
+				cConResponse.setReturnCRM("false");
+				cConResponse.setErrCode("002");
+				cConResponse.setErrReason("Found issue with your Telstra LAN logon ID[" + cConReq.getTelstraId() + "]. Internet user profile already exist in the CRM system.");  
+		 	} else {
+
+
+			 // Retrieve the return values from FMF
+			 String firstName 	= jCoFunction.getExportParameterList().getString("FIRSTNAME");
+			 String lastName 	= jCoFunction.getExportParameterList().getString("LASTNAME");
+			 String email 		= jCoFunction.getExportParameterList().getString("EMAIL");	       
+			
+			strRetrieve.append("Telstra:: CRM retrieved following values , FIRSTNAME[ ").append(firstName)
+					.append(" ], LASTNAME[ ").append(lastName).append(" ] , EMAIL [ ").append(email);
+				
+
+			SimpleLogger.trace(Severity.INFO, location, method + " Telstra:: - with Retrieve data :" + strRetrieve.toString());
+	
+				// End Call FM
+				// Assemble Response Object
+				cConResponse.setFirstName(firstName);
+				cConResponse.setLastName(lastName);
+				cConResponse.setEmailAddress(email);
+				cConResponse.setReturnCRM("X");
+				
+			 }
+			
+		} catch (Exception jCoException) {
+			SimpleLogger.trace(Severity.ERROR, location,
+					method + " Telstra:: - request with " + ConnectorUtils.converToJson(cConReq) + " - data retrieve with "
+							+ strRetrieve.toString() + " - response data with "
+							+ ConnectorUtils.converToJson(cConResponse));
+			SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoException);
+
+			cConResponse.setReturnCRM("false");
+			cConResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			cConResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+
+		} finally {
+			// TODO Object clean up task
+			location.exiting(method);
+		}
+		return cConResponse;
+
+	}
+
+ 	@Override
+	public SAPConnectorResponse callRegisterTheLogonId(SAPConnectorRequest cConReq) throws ConnectorException {
+		String method = "Telstra:: registerTheLogonId";
+		location.entering(method);
+		SimpleLogger.trace(Severity.INFO, location,
+				method + "Telstra:: - with request parameters :" + ConnectorUtils.converToJson(cConReq));
+
+		// Call Function Module
+		StringBuffer strRetrieve = new StringBuffer();
+		SAPConnectorResponse cConResponse = new SAPConnectorResponse();
+		ServiceLocator serviceLocator = ServiceLocator.getInstance();
+		JCoDestination jCoDestination = serviceLocator.getJavaConnectorObject();
+		
+		try {
+			// Call Function module to find if business partner exist for logon id e.g. C1234567
+	        JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(ABAP_FM_TELSTRA_USER_REGISTRATION);
+	        		
+	        // If FM is null, then throw error or return appropriate error code/message
+	        if(jCoFunction == null) {
+	        	throw new ConnectorException("Technical issue, " + "Function module " + ABAP_FM_TELSTRA_USER_REGISTRATION
+						+ " not found in SAP");
+	        }
+	        
+	        // Set required values to import parameters list 
+			jCoFunction.getImportParameterList().setValue("LOGONID", cConReq.getTelstraId()); // Logon Id enter by the user
+			jCoFunction.getImportParameterList().setValue("ACTION", "REGISTER"); // REGISTER action parameter to register for Logon ID 
+	        	        
+	        // Execute the FM
+			SimpleLogger.trace(Severity.INFO, location,
+			method + "Telstra:: REGISTER Executing FM[" + ABAP_FM_TELSTRA_USER_REGISTRATION + "] with parameters["
+					+ cConReq.getTelstraId() +"] " );
+			 jCoFunction.execute(jCoDestination);
+	        	        
+	        // Check if Internet user created successfully
+	        Iterator<JCoField> iterator = jCoFunction.getExportParameterList().iterator();
+	        while(iterator.hasNext()) {
+	        	JCoField jCoField = (JCoField)iterator.next();
+				SimpleLogger.trace(Severity.INFO, location,
+				method + "Telstra:: Return parameter list" + jCoField.toString() );
+	        
+	        }
+	        String internetUserCreationStatus 	= jCoFunction.getExportParameterList().getString("USER_CREATED");
+	       
+			SimpleLogger.trace(Severity.INFO, location,
+			method + "Telstra:: REGISTER Executing FM[" + ABAP_FM_TELSTRA_USER_REGISTRATION + "] return value[" + internetUserCreationStatus + "]" );
+			
+			if(!"X".equalsIgnoreCase(internetUserCreationStatus)) {
+	     		SimpleLogger.trace(Severity.INFO, location,
+				method + "Telstra:: Unable to activate LPOnline profile for Telstra LAN logon ID[" + cConReq.getTelstraId() + "] during activation process." );
+				cConResponse.setReturnCRM("false");
+				cConResponse.setErrCode("001");
+				cConResponse.setErrReason("Unable to activate your LPOnline profile");  
+		    } else {
+				cConResponse.setReturnCRM("X");
+
+			}  
+	        
+		} catch(JCoException jCoException) {
+			SimpleLogger.trace(Severity.ERROR, location,
+					method + " Telstra:: - request with " + ConnectorUtils.converToJson(cConReq) + " - data retrieve with "
+							+ strRetrieve.toString() + " - response data with "
+							+ ConnectorUtils.converToJson(cConResponse));
+			SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoException);
+        	cConResponse.setReturnCRM("false");
+			cConResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			cConResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+			
+	
+		}catch(JCoRuntimeException jCoRuntimeException) {
+				//(127) JCO_ERROR_FIELD_NOT_FOUND : Field USER_CREATED not a member of OUTPUT
+				if(!jCoRuntimeException.getMessage().contains("USER_CREATED")) {
+					
+					SimpleLogger.trace(Severity.ERROR, location,
+					method + " Telstra:: - request with " + ConnectorUtils.converToJson(cConReq) + " - data retrieve with "
+							+ strRetrieve.toString() + " - response data with "
+							+ ConnectorUtils.converToJson(cConResponse));
+					 SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoRuntimeException);					
+				
+				} else {
+					SimpleLogger.traceThrowable(Severity.ERROR, location, "", jCoRuntimeException);	
+				}
+				cConResponse.setReturnCRM("false");
+			cConResponse.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			cConResponse.setErrReason(AppConstants.CALL_LEASEPLAN);
+			}
+		finally {
+			// TODO Object clean up task
+			location.exiting(method);
+		}
+		return cConResponse;
+	}
+
+
+
 
 }

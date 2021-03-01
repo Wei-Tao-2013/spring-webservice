@@ -74,4 +74,9 @@ public interface PortalService {
 
 	String getAuth0Token(String secret);
 	String storeAuth0Token(String secret, String auth0token);
+    
+	// Telstra user
+	Response findBusinessPartnerByTelstraId(String loginId);
+	Response registerTelstraUser(Request request);
+
 }

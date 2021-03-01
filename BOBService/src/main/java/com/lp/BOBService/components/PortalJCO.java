@@ -38,5 +38,13 @@ public abstract interface PortalJCO {
 
 	// update BP info into CRM
 	public abstract Response callSetBPInfo(Request request) throws ConnectorException;
+    
+	// get Telstra info by telstra Id
+
+	public abstract Response callFindBusinessPartnerForLogonId(String telstraId) throws ConnectorException;
+	// register Telstra info into portal
+	public abstract Response callRegisterTheLogonId(Request request) throws ConnectorException;
+
+
 
 }

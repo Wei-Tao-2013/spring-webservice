@@ -160,6 +160,7 @@ public class BOBController {
 		return res;
 	}
 
+
 	// Get BP Information v2
 	@RequestMapping(value = "/ume/api/BP", method = RequestMethod.GET, headers = "Accept=application/json")
 	public @ResponseBody Response getBPV2Endpoint(@RequestBody Request request) throws Throwable {
@@ -181,6 +182,20 @@ public class BOBController {
 		Response res = portalService.setBPinfo(request.getLogonId(), request.getAuth0BPEmail());
 		return res;
 	}
+
+	// Find Telstra user info by telstraId
+	@RequestMapping(value = "/ume/api/telstra/user/{telstraId}", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody Response findBusinessPartnerBytelstraId(@PathVariable("telstraId") String telstraId) throws Throwable {
+		Response res = portalService.findBusinessPartnerByTelstraId(telstraId);
+		return res;
+	}
+    // Register Telstra user in portal
+	@RequestMapping(value = "/ume/api/telstra/user", method = RequestMethod.POST, produces = "application/json")
+	public @ResponseBody Response registerTelstraUser(@RequestBody Request request) {
+		Response res = portalService.registerTelstraUser(request);
+		return res;
+	}
+
 
 
 	// check if login user has permission to go complete register as per user's

@@ -42,6 +42,14 @@ public interface SAPConnector {
 	public abstract SAPConnectorResponse callSetBPInfo(SAPConnectorRequest SAPConnectData)
 	throws ConnectorException;
 
+	// Find Telstra user from CRM 
+	public abstract SAPConnectorResponse callFindBusinessPartnerForLogonId(SAPConnectorRequest SAPConnectData)
+	throws ConnectorException;
+
+	//Create Telstra user in Portal
+	public abstract SAPConnectorResponse callRegisterTheLogonId(SAPConnectorRequest SAPConnectData)
+	throws ConnectorException;
+
 	/* test only */
 	public abstract SAPConnectorResponse callCustomerValidationTest(SAPConnectorRequest SAPConnectData)
 			throws ConnectorException;

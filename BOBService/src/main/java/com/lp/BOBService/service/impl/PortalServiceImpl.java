@@ -1575,4 +1575,54 @@ public class PortalServiceImpl implements PortalService {
 			return response;
 		}
 	}
+
+	@Override
+	public Response registerTelstraUser(Request request) {
+		Response response;
+		Response resJCO;
+	
+		try {
+			resJCO = portalJCOImpl.callRegisterTheLogonId(request);
+			return resJCO;
+		} catch (ConnectorException ec) {
+			// TODO Auto-generated catch block
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "Telstra:: PortalServiceImpl.registerTelstraUser",
+					"Call PortalJcoImpl with request of " + ServiceUtils.converToJson(request));
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
+			response = new Response();
+			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
+			return response;
+		}
+	}
+
+
+	@Override
+	public Response findBusinessPartnerByTelstraId(String loginId) {
+		Response response;
+		Response resJCO;
+	
+		try {
+			resJCO = portalJCOImpl.callFindBusinessPartnerForLogonId(loginId);
+			return resJCO;
+		} catch (ConnectorException ec) {
+			// TODO Auto-generated catch block
+			SimpleLogger.log(Severity.ERROR, Category.SYS_SERVER, loc, "Telstra:: PortalServiceImpl.findBusinessPartnerForLogonId",
+					"Call PortalJcoImpl with request telstra id " + loginId);
+			SimpleLogger.traceThrowable(Severity.ERROR, loc, "", ec);
+			response = new Response();
+			response.setErrCode(AppConstants.ERROR_CODE_JCO_EXCETPION);
+			response.setErrReason(AppConstants.CALL_LEASEPLAN);
+			response.setReturnUME(AppConstants.RETURN_UME_FALSE);
+			response.setReturnCRM(AppConstants.RETURN_CRM_FALSE);
+			return response;
+		}
+
+	}
+
+
+
+
 }

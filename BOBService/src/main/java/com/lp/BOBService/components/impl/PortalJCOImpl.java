@@ -307,4 +307,37 @@ public class PortalJCOImpl implements PortalJCO {
 		return response;
 	}
 
+	@Override
+	public Response callFindBusinessPartnerForLogonId(String telstraId) throws ConnectorException {
+		// TODO Auto-generated method stub
+		SAPConnector sapConnector = new SAPConnectorImpl();
+		SAPConnectorRequest sapReq = new SAPConnectorRequest();
+		sapReq.setTelstraId(telstraId);
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Telstra::Call callFindBusinessPartnerForLogonId from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
+		
+		SAPConnectorResponse sapResponse = sapConnector.callFindBusinessPartnerForLogonId(sapReq);
+		SimpleLogger.trace(Severity.INFO, loc, "Telstra::Response from callFindBusinessPartnerForLogonId info to PortalJCOImpl with Json data"
+				+ ServiceUtils.converToJson(sapResponse));
+		Response response = convertJcoResponse(sapResponse);
+		return response;
+	}
+
+
+	@Override
+	public Response callRegisterTheLogonId(Request request) throws ConnectorException {
+		// TODO Auto-generated method stub
+		SAPConnector sapConnector = new SAPConnectorImpl();
+		SAPConnectorRequest sapReq = new SAPConnectorRequest();
+		sapReq = (SAPConnectorRequest) ServiceUtils.copyProperties(request, sapReq);
+		SimpleLogger.trace(Severity.INFO, loc,
+				"Telstra::Call callRegisterTheLogonId from PortalJCOImpl with Json request" + ServiceUtils.converToJson(sapReq));
+		SAPConnectorResponse sapResponse = sapConnector.callRegisterTheLogonId(sapReq);
+		SimpleLogger.trace(Severity.INFO, loc, "Telstra::Response from callRegisterTheLogonId info to PortalJCOImpl with Json data"
+				+ ServiceUtils.converToJson(sapResponse));
+		Response response = convertJcoResponse(sapResponse);
+		return response;
+	}
+
+
 }

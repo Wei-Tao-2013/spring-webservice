@@ -61,5 +61,6 @@ public class SAPConnectorRequest implements java.io.Serializable {
 	private String simpleFlag; // inidcator of for password reset process if simpleFlag = ture in case of there
 								// is no su01 in CRM
 	private String Auth0BPEmail;
+	private String telstraId;
 
 }

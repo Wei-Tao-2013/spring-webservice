@@ -79,5 +79,6 @@ public class Request implements java.io.Serializable {
    private String auth0Token;
 
    private String auth0BPEmail;
+   private String telstraId;
 	
 }
